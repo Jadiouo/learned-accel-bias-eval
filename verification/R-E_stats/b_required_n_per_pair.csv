@@ -1,0 +1,17 @@
+,,A,B
+n_req_holm,count,275.0,220.0
+n_req_holm,mean,105.6,132.63181818181818
+n_req_holm,std,136.00850660386334,149.74540307125073
+n_req_holm,min,3.0,3.0
+n_req_holm,25%,14.0,16.0
+n_req_holm,50%,35.0,52.0
+n_req_holm,75%,127.0,232.75
+n_req_holm,max,400.0,400.0
+n_req_unadj,count,275.0,220.0
+n_req_unadj,mean,71.13454545454546,92.21363636363637
+n_req_unadj,std,119.40940465074122,133.65010816072694
+n_req_unadj,min,3.0,3.0
+n_req_unadj,25%,7.0,7.0
+n_req_unadj,50%,16.0,23.5
+n_req_unadj,75%,57.5,105.75
+n_req_unadj,max,400.0,400.0

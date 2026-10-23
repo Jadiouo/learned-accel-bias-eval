@@ -1,0 +1,19 @@
+dataset,eval_sequence,n_distinct_winners,n_seeds,p_two_seeds_disagree,top_share,winners
+EuRoC,MH_01,3,10,0.6444444444444444,0.5,m3_lstm;m5;m5;m5;m5;m3_lstm;m3_lstm;m5;transformer_l;m3_lstm
+EuRoC,MH_02,4,10,0.8,0.3,m4;m5;m4;m5;mamba;m3_lstm;m5;mamba;m4;mamba
+EuRoC,MH_03,6,10,0.8666666666666667,0.3,transformer_m;m4;transformer_m;m6;m6;transformer_m;m5;m6;transformer_s;m3_lstm
+EuRoC,MH_04,5,10,0.8444444444444444,0.3,m6;tcn;m3_lstm;m4;m6;m3_lstm;m3_lstm;m1_cnn;m6;m4
+EuRoC,MH_05,4,10,0.7111111111111111,0.5,m6;m6;m3_lstm;m6;m5;m3_lstm;m4;m6;m3_lstm;m6
+EuRoC,RATE(any>1 winner),5,5,0.7733333333333333,,
+TUMVI_main,room1,5,10,0.8,0.4,m6;mamba;m6;m6;m6;mamba;m2;m5;mamba;transformer_s
+TUMVI_main,room3,5,10,0.8,0.4,m4;m5;m4;tcn;m4;m5;m4;m3_lstm;m5;transformer_m
+TUMVI_main,room4,3,10,0.6,0.6,m2;m2;m2;mamba;m1_cnn;m1_cnn;m2;m2;m2;m1_cnn
+TUMVI_main,room5,4,10,0.8,0.3,m6;m6;mamba;m1_cnn;m5;mamba;mamba;m6;m5;m5
+TUMVI_main,RATE(any>1 winner),4,4,0.75,,
+TUMVI_all,room1,5,10,0.8,0.4,m6;mamba;m6;m6;m6;mamba;m2;m5;mamba;transformer_s
+TUMVI_all,room2,7,10,0.9111111111111111,0.3,transformer_m;transformer_s;transformer_s;transformer_l;m3_lstm;m1_cnn;mamba;transformer_s;m2;transformer_l
+TUMVI_all,room3,5,10,0.8,0.4,m4;m5;m4;tcn;m4;m5;m4;m3_lstm;m5;transformer_m
+TUMVI_all,room4,3,10,0.6,0.6,m2;m2;m2;mamba;m1_cnn;m1_cnn;m2;m2;m2;m1_cnn
+TUMVI_all,room5,4,10,0.8,0.3,m6;m6;mamba;m1_cnn;m5;mamba;mamba;m6;m5;m5
+TUMVI_all,room6,9,10,0.9777777777777777,0.2,transformer_m;transformer_l;m5;transformer_l;m4;mamba;m3_lstm;tcn;transformer_s;m1_cnn
+TUMVI_all,RATE(any>1 winner),6,6,0.8148148148148149,,

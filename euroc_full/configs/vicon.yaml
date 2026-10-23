@@ -1,0 +1,69 @@
+# ──────────────────────────────────────────────────────────────────────────
+# EuRoC Vicon Room（V1_01–03, V2_01–03）— 僅 regime A（每序列各自 70/15/15 時序切分）。
+# 純 config、不改任何既有程式：沿用 EurocAdapter（dataset: euroc），靠 seq_folders 對應資料夾名。
+# MH has only laser-tracker position ground truth; V has 6-DoF Vicon motion-capture ground truth.
+# 用法（資料目錄由 EUROC_DATA_DIR 指定）：
+#   export EUROC_DATA_DIR=<repo>/.data/vicon_room
+#   python -m euroc_full.run --config configs/vicon.yaml --full
+# results_dir 獨立（results_vicon），不會碰到原 MH 的 results/。
+# 注意：沒有 regime B → 不要對本 config 跑 --analyze（analysis.py 預設吃 regime B）；
+#       直接彙整 results_vicon/runs_index.csv 與 runs/*/metrics.json。
+# ──────────────────────────────────────────────────────────────────────────
+dataset: euroc
+data_dir: ${EUROC_DATA_DIR}
+results_dir: results_vicon
+
+sequences: [V1_01, V1_02, V1_03, V2_01, V2_02, V2_03]
+seq_folders:
+  V1_01: V1_01_easy
+  V1_02: V1_02_medium
+  V1_03: V1_03_difficult
+  V2_01: V2_01_easy
+  V2_02: V2_02_medium
+  V2_03: V2_03_difficult
+
+regimes:
+  A: {type: within_sequence, split: [0.70, 0.15, 0.15]}
+
+seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+
+window: 200
+stride: 5
+imu_freq: 200
+merge_tol_ms: 10
+gap_tol_factor: 2.0
+small_gap_sec: 0.1
+gravity: 9.81
+
+# 11 DL + 非深度基線（regime A 無 constant_pooled）
+methods: [constant_perseq, linear_stats, kf, pf,
+          tcn, transformer_s, transformer_m, transformer_l, mamba,
+          m1_cnn, m2, m3_lstm, m4, m5, m6]
+
+metrics: [iabe_rot, iabe_body, gyro_ate, bias_rmse, slie, ate_reduction]
+slie_taus: [5, 10, 15]
+
+model:
+  dropout: 0.3
+  cnn_filters: 64
+  hidden_dim: 128
+  num_layers: 2
+  tcn_channels: [128, 128, 128, 128]
+  tcn_kernel: 7
+  mamba_d_model: 96
+  mamba_layers: 4
+
+train:
+  epochs: 60
+  lr: 0.001
+  batch_size: 64
+  early_stop_patience: 8
+  clip_norm: 1.0
+
+determinism: {seed_everything: true, torch_deterministic: false}
+
+analysis:
+  l2_robust: {alpha: 0.05, min_gap_over_sigma: 2.0, test: wilcoxon}
+  band_decomp: {bands_hz: [[0, 0.5], [0.5, 2.0], [2.0, null]], fs: 200}
+
+save_series: true

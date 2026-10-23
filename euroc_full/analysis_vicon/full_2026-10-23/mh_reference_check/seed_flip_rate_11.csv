@@ -1,0 +1,14 @@
+# [MH-reference] results_dir=<REPO>/euroc_full/results ; coverage: see coverage.md
+metric,seq,n_methods,n_distinct_winners,n_seeds,p_two_seeds_disagree,top_share,random_baseline,winners
+IABE,MH_01,11,3.0,10,0.6444444444444444,0.5,0.9090909090909091,m3_lstm;m5;m5;m5;m5;m3_lstm;m3_lstm;m5;transformer_l;m3_lstm
+IABE,MH_02,11,4.0,10,0.8,0.3,0.9090909090909091,m4;m5;m4;m5;mamba;m3_lstm;m5;mamba;m4;mamba
+IABE,MH_03,11,6.0,10,0.8666666666666667,0.3,0.9090909090909091,transformer_m;m4;transformer_m;m6;m6;transformer_m;m5;m6;transformer_s;m3_lstm
+IABE,MH_05,11,4.0,10,0.7111111111111111,0.5,0.9090909090909091,m6;m6;m3_lstm;m6;m5;m3_lstm;m4;m6;m3_lstm;m6
+IABE,MH_04,11,5.0,10,0.8444444444444444,0.3,0.9090909090909091,m6;tcn;m3_lstm;m4;m6;m3_lstm;m3_lstm;m1_cnn;m6;m4
+IABE,MEAN,11,,10,0.7733333333333333,,0.9090909090909091,
+bias_rmse,MH_01,11,3.0,10,0.6444444444444444,0.5,0.9090909090909091,m3_lstm;m5;m5;m5;m5;m3_lstm;m3_lstm;m5;transformer_l;m3_lstm
+bias_rmse,MH_02,11,3.0,10,0.7111111111111111,0.4,0.9090909090909091,m4;m5;m4;m5;m6;m6;m6;m4;m6;m4
+bias_rmse,MH_03,11,3.0,10,0.6,0.6,0.9090909090909091,m6;m5;m5;m6;m6;m6;m5;m6;m3_lstm;m6
+bias_rmse,MH_05,11,3.0,10,0.6444444444444444,0.5,0.9090909090909091,m5;m6;m5;m6;m5;m5;m1_cnn;m6;m6;m6
+bias_rmse,MH_04,11,3.0,10,0.6888888888888889,0.5,0.9090909090909091,m6;m4;m5;m4;m6;m6;m5;m5;m6;m6
+bias_rmse,MEAN,11,,10,0.6577777777777778,,0.9090909090909091,

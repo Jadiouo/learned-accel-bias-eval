@@ -1,0 +1,56 @@
+# ──────────────────────────────────────────────────────────────────────────
+# EuRoC Full Matrix — smoke / preflight（SDD §7.1）。
+# 每方法 × 1 seq × 1 seed，極短訓練；驗 Mamba fallback / Transformer 收斂 / causal mask /
+# PF / linear_stats / metric sanity。**不過不准進 --full**。
+# ──────────────────────────────────────────────────────────────────────────
+dataset: euroc
+data_dir: ${EUROC_DATA_DIR}
+results_dir: results_smoke
+
+sequences: [MH_03]                    # 單序列
+regimes:
+  A: {type: within_sequence, split: [0.70, 0.15, 0.15]}
+  B:
+    type: interpolation_pooled
+    pooled_train: [MH_01, MH_03]      # 最小池化（2 條即可驗管線）
+    eval_on_own_tail: true
+    constant: global_pooled
+
+seeds: [42]                            # 單 seed
+
+window: 200
+stride: 5
+imu_freq: 200
+merge_tol_ms: 10
+gap_tol_factor: 2.0
+small_gap_sec: 0.1
+gravity: 9.81
+
+methods: [constant_pooled, constant_perseq, linear_stats, kf, pf,
+          tcn, transformer_s, transformer_m, transformer_l, mamba,
+          m1_cnn, m2, m3_lstm, m4, m5, m6]
+
+metrics: [iabe_rot, iabe_body, gyro_ate, bias_rmse, slie, ate_reduction]
+slie_taus: [5, 10, 15]
+
+model:
+  dropout: 0.3
+  cnn_filters: 64
+  hidden_dim: 128
+  num_layers: 2
+  tcn_channels: [128, 128, 128, 128]
+  tcn_kernel: 7
+  mamba_d_model: 96
+  mamba_layers: 4
+
+train:
+  epochs: 2                            # ★ 極短，只驗能 forward/backward + 收斂趨勢
+  lr: 0.001
+  batch_size: 64
+  early_stop_patience: 2
+  clip_norm: 1.0
+
+determinism: {seed_everything: true, torch_deterministic: false}
+analysis:
+  l2_robust: {alpha: 0.05, min_gap_over_sigma: 2.0, test: wilcoxon}
+save_series: false

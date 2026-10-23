@@ -1,0 +1,76 @@
+# ──────────────────────────────────────────────────────────────────────────
+# TUM-VI Room 階段（SDD_TUMVI_Room §6）。擴充 euroc_full：同一套 code、results 分流。
+# 無硬編路徑：data_dir 由 --data-dir / TUMVI_DATA_DIR / 此處 ${TUMVI_DATA_DIR} 解析。
+# ──────────────────────────────────────────────────────────────────────────
+dataset: tumvi_room
+data_dir: ${TUMVI_DATA_DIR}            # 例：/path/to/TUM-VI（含 room1..room6/mav0/...）
+adapter: TumviRoomAdapter
+label_source: mocap                     # 本階段；okvis 留給後續 R4 ablation
+results_dir: results/tumvi              # ★ 與 EuRoC 的 results/ 分流，絕不覆蓋 684 runs
+
+sequences: [room1, room2, room3, room4, room5, room6]   # corridor/magistrale/outdoors 不列
+regimes:
+  A: {type: within_sequence, split: [0.70, 0.15, 0.15]}
+  B:
+    type: interpolation_pooled
+    pooled_train: [room1, room2, room3, room4, room5, room6]
+    eval_on_own_tail: true
+    constant: global_pooled             # ★ global-pooled，絕不 per-seq
+
+seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51]   # 10
+
+# ---- windowing（沿用 euroc_full；gap-clean 這次 load-bearing）----
+window: 200            # 1 s @ 200 Hz
+stride: 5
+imu_freq: 200
+merge_tol_ms: 10       # mocap 120Hz(8.3ms) → 10ms tol 覆蓋；真 gap(>0.5s)會被丟
+gap_tol_factor: 2.0    # window 內 max Δt > 2×nominal → 丟（room 有真 gap）
+small_gap_sec: 0.1     # 極小 gap 對 pose/bias label cubic spline 內插補回
+gravity: 9.81
+
+# ---- ★ motion-tail mask（TUM-VI only；EuRoC config 無此鍵 → 完全不啟用）----
+# 丟棄「窗內 mean|a_world| 超過此分位（top 5%）」的窗。逐序列一次性閾值，
+# 對所有方法/所有 seed 完全一致（絕不方法相關或 seed 相關）。room 為低動態手持，
+# 此 mask 去掉少數高動態尾巴，讓 MoCap-derived label 的二次微分洩漏不污染評估。
+motion_tail_mask_quantile: 0.95
+
+# ---- ★ mocap-derived bias label 的平滑（§4.3；room1 derisk 決定）----
+mocap_smoothing:
+  method: savgol
+  window: 101          # ~0.5 s @ 200Hz（奇數）；二次微分平滑視窗，room1 derisk 校準
+  polyorder: 3
+  bias_smooth_window: null   # 額外對 b_a 平滑（null = 不額外平滑）
+
+methods: [constant_pooled, constant_perseq, linear_stats, kf, pf,
+          tcn, transformer_s, transformer_m, transformer_l, mamba,
+          m1_cnn, m2, m3_lstm, m4, m5, m6]
+
+metrics: [iabe_rot, iabe_body, gyro_ate, bias_rmse, slie, ate_reduction]
+slie_taus: [5, 10, 15]
+
+model:
+  dropout: 0.3
+  cnn_filters: 64
+  hidden_dim: 128
+  num_layers: 2
+  tcn_channels: [128, 128, 128, 128]
+  tcn_kernel: 7
+  mamba_d_model: 96
+  mamba_layers: 4
+
+train:
+  epochs: 60
+  lr: 0.001
+  batch_size: 64
+  early_stop_patience: 8
+  clip_norm: 1.0
+
+determinism: {seed_everything: true, torch_deterministic: false}
+
+# ---- 分析：L2 §9 收緊判準（同 euroc_full）+ ★ 新增 bias-error 頻帶分解（§8）----
+analysis:
+  l2_robust: {alpha: 0.05, min_gap_over_sigma: 2.0, test: wilcoxon}
+  band_decomp: {bands_hz: [[0, 0.5], [0.5, 2.0], [2.0, null]], fs: 200}
+  cross_dataset_ordering: {euroc_results_dir: results}   # EuRoC 結果樹（做跨資料集排序比較）
+
+save_series: true      # per-sample b_hat/b_ref → npz（頻帶分解要用）

@@ -1,0 +1,62 @@
+# ──────────────────────────────────────────────────────────────────────────
+# EuRoC Full Matrix — 完整 matrix（driving everything）。SDD §5。
+# 無硬編路徑：data_dir 由 --data-dir / EUROC_DATA_DIR / 此處 ${EUROC_DATA_DIR} 解析。
+# ──────────────────────────────────────────────────────────────────────────
+dataset: euroc
+data_dir: ${EUROC_DATA_DIR}          # 例：/path/to/EuRoC/machine_hall
+results_dir: results                  # 相對「執行時 cwd」；gitignored
+
+sequences: [MH_01, MH_02, MH_03, MH_05, MH_04]   # regime A 全跑（含 MH_04）
+regimes:
+  A: {type: within_sequence, split: [0.70, 0.15, 0.15]}
+  B:
+    type: interpolation_pooled
+    pooled_train: [MH_01, MH_02, MH_03, MH_05]    # heads 池化；MH_04 不入 pooling
+    eval_on_own_tail: true
+    constant: global_pooled                        # ★ 不可 per-seq
+
+seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51]    # ★ 10 個（n=5 時 Wilcoxon 測不了 L2）
+
+# ---- windowing（沿用 MVP，gap-clean 為 TUM-VI 鋪路）----
+window: 200            # 1 s @ 200 Hz
+stride: 5
+imu_freq: 200
+merge_tol_ms: 10
+gap_tol_factor: 2.0
+small_gap_sec: 0.1
+gravity: 9.81
+
+methods: [constant_pooled, constant_perseq, linear_stats, kf, pf,
+          tcn, transformer_s, transformer_m, transformer_l, mamba,
+          m1_cnn, m2, m3_lstm, m4, m5, m6]
+
+metrics: [iabe_rot, iabe_body, gyro_ate, bias_rmse, slie, ate_reduction]
+slie_taus: [5, 10, 15]
+
+# ---- 模型超參（registry 用）----
+model:
+  dropout: 0.3
+  cnn_filters: 64
+  hidden_dim: 128
+  num_layers: 2
+  tcn_channels: [128, 128, 128, 128]
+  tcn_kernel: 7
+  mamba_d_model: 96
+  mamba_layers: 4
+
+# ---- 訓練 ----
+train:
+  epochs: 60
+  lr: 0.001
+  batch_size: 64
+  early_stop_patience: 8
+  clip_norm: 1.0
+
+determinism: {seed_everything: true, torch_deterministic: false}
+
+# ---- 分析（L2 §9 收緊 + bias-error 頻帶分解機制）----
+analysis:
+  l2_robust: {alpha: 0.05, min_gap_over_sigma: 2.0, test: wilcoxon}
+  band_decomp: {bands_hz: [[0, 0.5], [0.5, 2.0], [2.0, null]], fs: 200}   # §8（fs 實際=imu_freq/stride）
+
+save_series: true      # per-sample b_hat/b_ref → npz（1/ω² 分析用）

@@ -1,0 +1,16 @@
+# [FULL] results_dir=<REPO>/euroc_full/results_vicon ; coverage: see coverage.md
+metric,seq,n_methods,n_distinct_winners,n_seeds,p_two_seeds_disagree,top_share,random_baseline,winners
+IABE,V1_01,11,4.0,10,0.8222222222222222,0.3,0.9090909090909091,m6;m6;m6;transformer_s;transformer_s;m3_lstm;m5;m5;m3_lstm;m5
+IABE,V1_02,11,5.0,10,0.8444444444444444,0.3,0.9090909090909091,m6;m4;m5;m3_lstm;m3_lstm;m5;m6;mamba;m5;m6
+IABE,V1_03,11,2.0,10,0.4666666666666667,0.7,0.9090909090909091,m6;m6;m5;m5;m5;m5;m5;m5;m5;m6
+IABE,V2_01,11,6.0,10,0.8888888888888888,0.3,0.9090909090909091,m6;m3_lstm;m6;transformer_m;m3_lstm;transformer_m;m5;mamba;m6;transformer_s
+IABE,V2_02,11,5.0,10,0.7555555555555555,0.5,0.9090909090909091,transformer_m;m2;transformer_l;transformer_m;transformer_m;transformer_m;transformer_l;transformer_s;mamba;transformer_m
+IABE,V2_03,11,7.0,10,0.9111111111111111,0.3,0.9090909090909091,transformer_s;m4;transformer_l;m6;m3_lstm;m6;m5;m4;m6;transformer_m
+IABE,MEAN,11,,10,0.7814814814814816,,0.9090909090909091,
+bias_rmse,V1_01,11,3.0,10,0.6444444444444444,0.5,0.9090909090909091,m6;m6;m6;m5;m5;m5;m5;m6;m3_lstm;m5
+bias_rmse,V1_02,11,4.0,10,0.6444444444444444,0.6,0.9090909090909091,m6;m4;m5;m6;m6;m5;m6;m3_lstm;m6;m6
+bias_rmse,V1_03,11,4.0,10,0.7111111111111111,0.5,0.9090909090909091,m6;m3_lstm;m6;m6;m5;m5;m4;m5;m6;m6
+bias_rmse,V2_01,11,4.0,10,0.7333333333333334,0.5,0.9090909090909091,m6;transformer_l;m6;m6;m5;transformer_m;m5;m6;m6;transformer_l
+bias_rmse,V2_02,11,3.0,10,0.6444444444444444,0.5,0.9090909090909091,transformer_m;transformer_m;transformer_l;transformer_m;transformer_m;transformer_l;transformer_l;transformer_s;transformer_l;transformer_m
+bias_rmse,V2_03,11,5.0,10,0.7555555555555555,0.5,0.9090909090909091,m6;m4;transformer_l;m6;m3_lstm;m6;m6;m4;m6;m5
+bias_rmse,MEAN,11,,10,0.6888888888888888,,0.9090909090909091,

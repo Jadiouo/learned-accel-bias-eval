@@ -1,0 +1,10 @@
+{
+ "max_rel_err": {
+  "theta_bar": 6.722612919121476e-16,
+  "leak": 1.7120520186385517e-16,
+  "g_theta_over_eps": 1.5580502654790708e-16,
+  "ate": 2.429711066222111e-16
+ },
+ "mahony_theta_bar_median": 2.223530791027603,
+ "rF_pooled_rate_max_abs_diff": 5.551115123125783e-17
+}

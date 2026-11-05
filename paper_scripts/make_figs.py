@@ -51,7 +51,7 @@ def fig1():
     arr(2.5, 6.2, 3.5, 6.2); arr(2.5, 3.1, 3.5, 3.1)
     box(7.3, 3.7, 2.7, 1.8, "ATE:\nboth lanes", fc="#EEEEEE")
     arr(6.0, 6.2, 7.3, 5.0); arr(6.0, 3.1, 7.3, 4.2)
-    ax.text(4.75, 7.75, "shared attitude: IABE\n(common terms cancel)", fontsize=8, ha="center", va="center", color="#007A5A")
+    ax.text(4.75, 7.75, "shared attitude: IABE\n(shared terms cancel)", fontsize=8, ha="center", va="center", color="#007A5A")
     ax.add_patch(Rectangle((3.4, 5.3), 2.7, 1.8, fill=False, ec=OI["green"], lw=1.2))
     box(0.0, 0.0, 10.0, 1.2, "ESKF onset states (IV-B): different quantity", ls="--", fs=8)
     save(fig, "fig1_error_flow.pdf")
@@ -284,7 +284,7 @@ def supp_tables():
             ("s_gyro-bias-comp-50%", "Gyro bias 50\\% compensated"), ("c_static-mean-bias", "Static average"),
             ("d_mahony(kp=1,ki=0.05)", "Mahony ($k_p{=}1$, $k_i{=}0.05$)"), ("s_mahony(kp=5,ki=0.05)", "Mahony ($k_p{=}5$, $k_i{=}0.05$)"),
             ("e_mahony_gated(kp=1,ki=0.05)", "Gated Mahony")]
-    out = ["\\begin{table}[!t]", "\\caption{Full version of Table~I: gravity leakage by attitude source, including compensation variants (five-sequence medians). Leakage multiple = median leakage $\\div$ regime median IABE (A: 0.0695~m; B: 0.791~m).}",
+    out = ["\\begin{table}[!t]", "\\caption{Full version of Table~III: gravity leakage by attitude source, including compensation variants (five-sequence medians). Leakage multiple = median leakage $\\div$ regime median IABE (A: 0.0695~m; B: 0.791~m).}",
            "\\label{tab:leakfull}", "\\centering", "\\footnotesize", "\\setlength{\\tabcolsep}{2.5pt}",
            "\\begin{tabular}{@{}lccc@{}}", "\\toprule",
            "Attitude source & $\\bar\\theta$ (\\textdegree) & Leakage/IABE (A / B) & $g\\bar\\theta/\\lVert\\boldsymbol\\varepsilon\\rVert$ (A / B) \\\\", "\\midrule"]
@@ -318,7 +318,7 @@ def supp_tables():
     def S(var, cons, pred):
         r = sp[(sp.variant == var) & (sp.L == 10) & (sp.cons == cons) & (sp.pred == pred)].iloc[0]
         return f"{r.rho_med:.2f}"
-    out = ["\\begin{table}[!t]", "\\caption{Rank correlation and component shares, ungated versus gated ($L=10$~s, nine cells for Spearman; base configuration for shares).}",
+    out = ["\\begin{table}[!t]", "\\caption{Rank correlation and component shares, ungated versus gated ($L=10$~s, nine cases for Spearman; base configuration for shares).}",
            "\\label{tab:gatedsp}", "\\centering", "\\footnotesize", "\\setlength{\\tabcolsep}{4pt}",
            "\\begin{tabular}{@{}lcc@{}}", "\\toprule", "Quantity & Ungated & Gated \\\\", "\\midrule"]
     for lab, cons, pred in (("Spearman IABE vs.\\ $C_{\\Delta}$", "delta", "iabe"), ("Spearman bias RMSE vs.\\ $C_{\\Delta}$", "delta", "bias_rmse"),
@@ -332,15 +332,15 @@ def supp_tables():
     (Path(__file__).resolve().parent / "supp_table_gatedsp.tex").write_text("\n".join(out) + "\n")
 
     f = pd.read_csv(R / "verification/R-B_scripts/flip_rate.csv")
-    f = f[f.dataset.isin(["EuRoC", "TUMVI_main"])]
-    out = ["\\begin{table}[!t]", "\\caption{Seed instability of the best method among 11 deep estimators (10 seeds). $p$: probability that two randomly chosen seeds select different best methods.}",
+    f = f[f.dataset == "EuRoC"]
+    out = ["\\begin{table}[!t]", "\\caption{Seed instability of the best method among 11 deep estimators (10 seeds), EuRoC Machine Hall, regime~A. $p$: probability that two randomly chosen seeds select different best methods.}",
            "\\label{tab:flip}", "\\centering", "\\footnotesize", "\\setlength{\\tabcolsep}{4pt}",
-           "\\begin{tabular}{@{}llcc@{}}", "\\toprule", "Dataset & Sequence & Distinct winners & $p$ \\\\", "\\midrule"]
-    for _, r in f.iterrows():
+           "\\begin{tabular}{@{}lcc@{}}", "\\toprule", "Sequence & Distinct winners & $p$ \\\\", "\\midrule"]
+    for _, r in pd.concat([f[~f.eval_sequence.astype(str).str.startswith("RATE")], f[f.eval_sequence.astype(str).str.startswith("RATE")]]).iterrows():
         if str(r.eval_sequence).startswith("RATE"):
-            out.append(f"{r.dataset.replace('TUMVI_main', 'TUM-VI')} & mean over sequences & --- & {r.p_two_seeds_disagree:.2f} \\\\ \\midrule" if r.dataset == "EuRoC" else f"{r.dataset.replace('TUMVI_main', 'TUM-VI')} & mean over sequences & --- & {r.p_two_seeds_disagree:.2f} \\\\")
+            out.append(f"mean over sequences & --- & {r.p_two_seeds_disagree:.2f} \\\\")
         else:
-            out.append(f"{r.dataset.replace('TUMVI_main', 'TUM-VI')} & {str(r.eval_sequence).replace('_', chr(92) + '_')} & {int(r.n_distinct_winners)} & {r.p_two_seeds_disagree:.2f} \\\\")
+            out.append(f"{str(r.eval_sequence).replace('_', chr(92) + '_')} & {int(r.n_distinct_winners)} & {r.p_two_seeds_disagree:.2f} \\\\")
     out += ["\\bottomrule", "\\end{tabular}", "\\end{table}"]
     (Path(__file__).resolve().parent / "supp_table_flip.tex").write_text("\n".join(out) + "\n")
 

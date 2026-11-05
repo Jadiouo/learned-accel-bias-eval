@@ -46,7 +46,7 @@ experiments/
   attitude_controls/     Table I: attitude sources (raw, oracle, static average, Mahony, gated Mahony); vqf/ (VQF sources)
   closed_loop/           Tables II-IV: ESKF outage experiment, Shapley decomposition, CIs; inekf/ (InEKF robustness)
   sim_truth/             known-truth simulation
-verification/            statistics scripts (R-B flip rate, R-E reliability/resolution, R-F direction agreement)
+verification/            statistics scripts (R-B flip rate, R-E reliability/resolution, R-F direction agreement, mamba_exclusion[_vicon])
 paper_scripts/           make_figs.py (figures and supplementary tables), make_vicon_numbers.py (LaTeX number macros)
 ```
 
@@ -105,6 +105,8 @@ session). All analysis scripts run on a CPU; the slowest, `analysis_vicon/t3_var
 | Fig. 4 direction agreement (split-half), fig. data | `verification/R-F_noncircular/rF_noncircular_stratified.py` | `part2_splithalf_agreement_stratified.csv` | summary CSVs only |
 | Seed instability (flip rate), Fig. 5 | `verification/R-B_scripts/tost_backfill.py` | `flip_rate.csv` | summary CSVs only |
 | Split-half reliability, resolution (MDE, seeds needed) | `verification/R-E_stats/rE_stats.py` | `verification/R-E_stats/*.csv` | summary CSVs only |
+| Mamba-exclusion sensitivity, MH (supplement S6; item (6) of S12): split-half agreement, Spearman ATE-IABE, flip rate and closed-loop ratio recomputed with the 11 deep methods and with the 10 without Mamba | `verification/mamba_exclusion/mamba_exclusion.py`, `mamba_pair_share.py` | `agreement.csv`, `spearman_ate_iabe.csv`, `flip.csv`, `distinguishable.csv`, `closed_loop.csv`, `mamba_pair_share.csv` | summary CSVs **plus** `experiments/closed_loop/{pre_outage_long,variants_long}.csv` (not included; produced by `run_pre_outage.py`, needs `series.npz`) |
+| Same Mamba-exclusion check on V1/V2 (supplement S6; item (6) of S12) | `verification/mamba_exclusion_vicon/mamba_exclusion_vicon.py` | `agreement.csv`, `agreement_per_seq.csv`, `flip.csv`, `distinguishable.csv`, `closed_loop.csv`, `mamba_outlier_ratio.csv` | per-run `euroc_full/results_vicon/runs/*/metrics.json` (not included, from training), and `euroc_full/analysis_vicon/full_2026-10-23/{t1_ate_per_run_gated,t3_pre_outage_long,t3_variants_long}.csv` (not included; produced by `t1_leakage.py` and `t3_variants.py`, need `series.npz`) |
 | Learned vs. constant baseline | `verification/learned_vs_const.py` | `learned_vs_const.csv` | summary CSVs only |
 | Known-truth simulation | `experiments/sim_truth/{sim_truth,run_all,analyze}.py` | `results_tables.md`, `results_summary.json` | MH ground truth |
 | V1/V2 (Vicon) results: Tables I-IV analogues, agreement, seed statistics | `euroc_full/analysis_vicon/run_all.sh` (`t1_leakage`, `t2_closed_loop`, `t3_variants`, `t3_spearman`, `t3_analyze`, `rf_agreement`, `seed_stability`) | `euroc_full/analysis_vicon/full_2026-10-23/*.csv` | raw data + `series.npz` |

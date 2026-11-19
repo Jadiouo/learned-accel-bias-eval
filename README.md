@@ -3,12 +3,13 @@
 Code and summary results for the paper
 
 > **MEMS Accelerometer Bias, Tilt, and the Position-Error Budget of Learned Bias Estimation**
-> Hao-Ting Ho. Submitted to IEEE Transactions on Aerospace and Electronic Systems (under review).
+> Hao-Ting Ho. Manuscript in preparation (not yet submitted).
 
 The paper shows how a shared attitude (tilt) error leaks gravity into the accelerometer-bias evaluation, how large
 this leakage is for common attitude sources, and how much of the closed-loop position error after a GNSS outage is
 shared by all bias estimators rather than caused by the estimator choice. The repository exists so that reviewers and
-readers can re-derive the numbers in the paper.
+readers can re-derive the numbers in the paper. Table and figure numbers below follow the manuscript draft of 2026-11-06
+(Table I: setup; II: definitions; III: gravity leakage; IV: position-error budget; V: robustness).
 
 ## What is and is not in this repository
 
@@ -27,7 +28,7 @@ Summary files that **are** included (so that table/figure scripts run without re
 
 - `euroc_full/results/runs_index.csv`, `euroc_full/results/metrics_wide.csv`: index and per-run metrics of the 684 EuRoC Machine Hall (MH) runs (11 deep methods x 10 seeds x regimes, plus baselines).
 - `euroc_full/results_vicon/runs_index.csv`: index of the 684 Vicon-room (V1/V2) runs.
-- `euroc_full/analysis_vicon/full_2026-10-23/`: all output CSVs of the V1/V2 analysis (final, 684/684 runs) and the MH port-check (`mh_reference_check/`).
+- `euroc_full/analysis_vicon/full_2026-10-23/`: the output CSVs of the V1/V2 analysis (final, 684/684 runs) and the MH port-check (`mh_reference_check/`).
 - `experiments/attitude_controls/*.csv`, `experiments/closed_loop/*.csv`, `experiments/closed_loop/inekf/**.csv`, `experiments/attitude_controls/vqf/**.csv`: outputs of the MH attitude-source and closed-loop experiments (the largest are `consequences_long.csv` 6.9 MB, `gated_consequences.csv` 2.2 MB, `ate_per_run*.csv` 1.7-2.1 MB).
 - `verification/`: split-half agreement, seed-stability and resolution statistics (scripts and CSVs).
 
@@ -43,8 +44,8 @@ euroc_full/
                          training stages and the resume stages), download/ (EuRoC V1/V2 IMU+GT downloader)
   analysis_vicon/        V1/V2 analysis pipeline (t1..t3, rf_agreement, seed_stability), run_all.sh, final outputs
 experiments/
-  attitude_controls/     Table I: attitude sources (raw, oracle, static average, Mahony, gated Mahony); vqf/ (VQF sources)
-  closed_loop/           Tables II-IV: ESKF outage experiment, Shapley decomposition, CIs; inekf/ (InEKF robustness)
+  attitude_controls/     Table III: attitude sources (raw, oracle, static average, Mahony, gated Mahony); vqf/ (VQF sources)
+  closed_loop/           Tables IV-V: ESKF outage experiment, Shapley decomposition, CIs; inekf/ (InEKF robustness)
   sim_truth/             known-truth simulation
 verification/            statistics scripts (R-B flip rate, R-E reliability/resolution, R-F direction agreement, mamba_exclusion[_vicon])
 paper_scripts/           make_figs.py (figures and supplementary tables), make_vicon_numbers.py (LaTeX number macros)
@@ -95,10 +96,10 @@ session). All analysis scripts run on a CPU; the slowest, `analysis_vicon/t3_var
 | Paper item | Script | Output file(s) | Needs |
 |---|---|---|---|
 | Training, evaluation, IABE/ATE metrics | `euroc_full/src/euroc_full/{run,train,metrics,data_euroc}.py`, `configs/full.yaml` | `euroc_full/results/{runs_index,metrics_wide}.csv` | raw data + GPU |
-| Table I and Fig. 2/dose response (MH): leakage by attitude source, theta, g*theta/eps | `experiments/attitude_controls/run_controls_gated.py` (`run_controls.py` = ungated version) | `table_sources_regime_summary_gated.csv`, `dose_points_gated.csv`, `ate_per_run_gated.csv` | raw data + `series.npz` |
-| Table I VQF rows, supplementary VQF table | `experiments/attitude_controls/vqf/run_vqf.py`, `vqf/v2/run_v2.py` | `vqf/v2/table_sources_*_v2.csv`, `agreement_v2.csv` | raw data + `series.npz`, `vqf` |
-| Table II: closed-loop budget (C_abs, C_Delta) | `experiments/closed_loop/run_closed_loop.py`, `unify_table.py`, `eskf.py` | `consequences_long.csv`, `table_unified.csv` | raw data + `series.npz` |
-| Table III/IV: shared-error / between-estimator ratio, variants P_est, P_off, O_q10, O_q01 | `run_pre_outage.py`, `analyze_3.py`, `ratio_ci.py`, `ci_seedmean.py` | `table3_ratio.csv`, `table3_state.csv`, `table_ratio_ci.csv`, `ci_seedmean.csv` | raw data + `series.npz` |
+| Table III and supplementary Fig. S1 (dose response), MH: leakage by attitude source, theta, g*theta/eps | `experiments/attitude_controls/run_controls_gated.py` (`run_controls.py` = ungated version) | `table_sources_regime_summary_gated.csv`, `dose_points_gated.csv`, `ate_per_run_gated.csv` | raw data + `series.npz` |
+| Table III VQF rows, supplementary VQF table | `experiments/attitude_controls/vqf/run_vqf.py`, `vqf/v2/run_v2.py` | `vqf/v2/table_sources_*_v2.csv`, `agreement_v2.csv` | raw data + `series.npz`, `vqf` |
+| Table IV and Fig. 2: closed-loop budget (C_abs, C_Delta) | `experiments/closed_loop/run_closed_loop.py`, `unify_table.py`, `eskf.py` | `consequences_long.csv`, `table_unified.csv` | raw data + `series.npz` |
+| Table V: shared-error / between-estimator ratio, variants P_est, P_off, O_q10, O_q01 | `run_pre_outage.py`, `analyze_3.py`, `ratio_ci.py`, `ci_seedmean.py` | `table3_ratio.csv`, `table3_state.csv`, `table_ratio_ci.csv`, `ci_seedmean.csv` | raw data + `series.npz` |
 | Shapley shares (Fig. 3), Spearman S1 | `decompose.py`, `summarize_decomp.py`, `analyze.py` | `table3_shapley.csv`, `decomp_summary.csv`, `table3_spearman.csv`, `scenario_stats.csv` | raw data |
 | Gated-tilt variants (supplementary) | `run_gated.py`, `analyze_gated.py`, `sens_gated.py` | `table_gated*.csv`, `gated_consequences.csv` | raw data + `series.npz` |
 | InEKF robustness | `experiments/closed_loop/inekf/{harness,inekf,analysis,verdict}.py`, `test_inekf.py` | `inekf/out_inekf/*.csv` | raw data |
@@ -109,7 +110,7 @@ session). All analysis scripts run on a CPU; the slowest, `analysis_vicon/t3_var
 | Same Mamba-exclusion check on V1/V2 (supplement S6; item (6) of S12) | `verification/mamba_exclusion_vicon/mamba_exclusion_vicon.py` | `agreement.csv`, `agreement_per_seq.csv`, `flip.csv`, `distinguishable.csv`, `closed_loop.csv`, `mamba_outlier_ratio.csv` | per-run `euroc_full/results_vicon/runs/*/metrics.json` (not included, from training), and `euroc_full/analysis_vicon/full_2026-10-23/{t1_ate_per_run_gated,t3_pre_outage_long,t3_variants_long}.csv` (not included; produced by `t1_leakage.py` and `t3_variants.py`, need `series.npz`) |
 | Learned vs. constant baseline | `verification/learned_vs_const.py` | `learned_vs_const.csv` | summary CSVs only |
 | Known-truth simulation | `experiments/sim_truth/{sim_truth,run_all,analyze}.py` | `results_tables.md`, `results_summary.json` | MH ground truth |
-| V1/V2 (Vicon) results: Tables I-IV analogues, agreement, seed statistics | `euroc_full/analysis_vicon/run_all.sh` (`t1_leakage`, `t2_closed_loop`, `t3_variants`, `t3_spearman`, `t3_analyze`, `rf_agreement`, `seed_stability`) | `euroc_full/analysis_vicon/full_2026-10-23/*.csv` | raw data + `series.npz` |
+| V1/V2 (Vicon) results: Tables III-V analogues, agreement, seed statistics | `euroc_full/analysis_vicon/run_all.sh` (`t1_leakage`, `t2_closed_loop`, `t3_variants`, `t3_spearman`, `t3_analyze`, `rf_agreement`, `seed_stability`) | `euroc_full/analysis_vicon/full_2026-10-23/*.csv` | raw data + `series.npz` |
 | V1/V2 number macros in the paper | `paper_scripts/make_vicon_numbers.py` | LaTeX macros (stdout) | `full_2026-10-23/` CSVs (included) |
 | Figures and supplementary tables | `paper_scripts/make_figs.py` | `paper_scripts/figs/*.pdf`, `supp_table_*.tex` | summary CSVs (included) |
 | Port check (V pipeline on MH reproduces the MH numbers) | `euroc_full/analysis_vicon/full_2026-10-23/run_mh_reference_full.sh` | `full_2026-10-23/mh_reference_check/` | raw data + `series.npz` |
@@ -120,8 +121,8 @@ session). All analysis scripts run on a CPU; the slowest, `analysis_vicon/t3_var
   References such as "SDD section X" point to an internal design document that is not part of this repository.
 - `verification/R-B_scripts/tost_backfill.py` also looks for TUM-VI results (`euroc_full/results/tumvi`), which are not distributed here; the EuRoC part
   works from the included files. `configs/tumvi.yaml` is kept for completeness.
-- `make_figs.py` regenerates the supplementary tables `supp_table_leak.tex` and `supp_table_flip.tex` with caption text that differs slightly from the
-  hand-edited versions in the manuscript; the numeric content of the four supplementary tables comes from the same CSV files.
+- `make_figs.py` regenerates the four supplementary tables `supp_table_*.tex`; their captions and numeric content match the manuscript draft
+  of 2026-11-06 and come from the included CSV files.
 - Machine-specific absolute paths were replaced by paths relative to the repository root and the `EUROC_DATA_DIR` environment variable. Header
   comments in some CSV/JSON outputs show `<REPO>` where the original absolute path was.
 

@@ -1,0 +1,78 @@
+[A rowwise] O_base: rows rerun=12540, matched in stored=12540, max|d delta|=1.682e-13 m, max rel d delta=6.030e-12, max|d abs|=9.035e-12 m, max rel d abs=5.212e-12
+[A rowwise] O_base CTRL:bref abs: rows=60, matched=60, max|d|=8.476e-12, max rel=3.973e-12
+[A rowwise] P_off: rows rerun=1600, matched in stored=1600, max|d delta|=2.296e-11 m, max rel d delta=5.154e-10, max|d abs|=1.227e-11 m, max rel d abs=7.362e-12
+[A rowwise] P_off CTRL:bref abs: rows=60, matched=60, max|d|=1.024e-11, max rel=1.012e-11
+
+== A ratio compare ==
+                                       0        1        2        3        4        5
+cfg                               O_base   O_base   O_base    P_off    P_off    P_off
+L                                      5       10       20        5       10       20
+n_est_rerun                          684      684      342       89       89       44
+n_est_stored                         684      684      342      684      684      342
+rerun.n_units                         25       25       10       25       25       10
+rerun.common_m                    0.6793   3.0309  10.8122     0.78   2.5362   6.0608
+rerun.median_delta_m              0.0706   0.2329   1.0366   0.0825    0.147   0.3979
+rerun.ratio_med                   9.9589  13.4577   9.8692   7.1754  12.0476  13.9894
+rerun.per_seq_min                 6.7355   6.4523   5.4457   5.2466   4.6732  13.8973
+rerun.per_seq_max                44.0872   184.94  14.8932  32.6312  49.0529  18.1888
+stored_same_rows.n_units              25       25       10       25       25       10
+stored_same_rows.common_m         0.6793   3.0309  10.8122     0.78   2.5362   6.0608
+stored_same_rows.median_delta_m   0.0706   0.2329   1.0366   0.0825    0.147   0.3979
+stored_same_rows.ratio_med        9.9589  13.4577   9.8692   7.1754  12.0476  13.9894
+stored_same_rows.per_seq_min      6.7355   6.4523   5.4457   5.2466   4.6732  13.8973
+stored_same_rows.per_seq_max     44.0872   184.94  14.8932  32.6312  49.0529  18.1888
+stored_full.n_units                   25       25       10       25       25       10
+stored_full.common_m              0.6793   3.0309  10.8122     0.78   2.5362   6.0608
+stored_full.median_delta_m        0.0706   0.2329   1.0366   0.1763   0.4127   1.1192
+stored_full.ratio_med             9.9589  13.4577   9.8692   5.2238   4.2905   5.1231
+stored_full.per_seq_min           6.7355   6.4523   5.4457   2.0149   3.4743   5.1161
+stored_full.per_seq_max          44.0872   184.94  14.8932  46.5497  75.8617   6.2144
+table3.ratio_med                  9.9589  13.4577   9.8692   5.2238   4.2905   5.1231
+table3.per_seq_min                6.7355   6.4523   5.4457   2.0149   3.4743   5.1161
+table3.common_m                   0.6793   3.0309  10.8122     0.78   2.5362   6.0608
+table3.median_delta_m             0.0706   0.2329   1.0366   0.1763   0.4127   1.1192
+
+== C summary (L=5,10) ==
+    n_units  common_m  median_delta_m  ratio_med  per_seq_min  per_seq_max     cfg   L          align  rho_delta_unit_median  rho_delta_unit_min  rho_delta_seqrms_median  rho_delta_seqrms_min  rho_abs_unit_median  rho_abs_unit_min
+0        25     0.679           0.071      9.959        6.735       44.087  O_base   5            cur                    NaN                 NaN                      NaN                   NaN                  NaN               NaN
+1        25     3.031           0.233     13.458        6.452      184.940  O_base  10            cur                    NaN                 NaN                      NaN                   NaN                  NaN               NaN
+3        25     0.780           0.083      7.175        5.247       32.631   P_off   5            cur                    NaN                 NaN                      NaN                   NaN                  NaN               NaN
+4        25     2.536           0.147     12.048        4.673       49.053   P_off  10            cur                    NaN                 NaN                      NaN                   NaN                  NaN               NaN
+6        25     0.679           0.073      9.647        7.876       64.062  O_base   5       caus_est                  0.983               0.908                    0.983                 0.908                0.982             0.815
+7        25     3.031           0.234     14.049        6.381      205.817  O_base  10       caus_est                  0.990               0.972                    0.990                 0.972                0.987             0.882
+9        25     0.780           0.084      7.360        4.976       31.960   P_off   5       caus_est                  0.989               0.968                    0.989                 0.968                0.979             0.889
+10       25     2.536           0.146     12.124        4.461       47.042   P_off  10       caus_est                  0.992               0.986                    0.992                 0.986                0.988             0.934
+12       25     0.679           0.073      9.648        7.878       64.885  O_base   5      caus_both                  0.983               0.905                    0.983                 0.905                0.982             0.815
+13       25     3.031           0.234     14.058        6.379      207.645  O_base  10      caus_both                  0.990               0.971                    0.990                 0.971                0.987             0.882
+15       25     0.780           0.083      7.396        4.973       31.470   P_off   5      caus_both                  0.989               0.968                    0.989                 0.968                0.979             0.889
+16       25     2.537           0.145     12.172        4.460       47.120   P_off  10      caus_both                  0.990               0.986                    0.990                 0.986                0.988             0.934
+18       25     0.679           0.058     12.127        7.923       63.615  O_base   5   holdrule_est                  0.967               0.876                    0.967                 0.876                0.965             0.772
+19       25     3.031           0.230     14.100        6.625      204.505  O_base  10   holdrule_est                  0.985               0.966                    0.985                 0.966                0.978             0.877
+21       25     0.780           0.081      7.438        5.284       31.838   P_off   5   holdrule_est                  0.981               0.968                    0.981                 0.968                0.978             0.863
+22       25     2.536           0.151     11.702        4.225       47.000   P_off  10   holdrule_est                  0.988               0.984                    0.988                 0.986                0.969             0.919
+24       25     0.679           0.058     12.128        7.923       64.225  O_base   5  holdrule_both                  0.967               0.876                    0.967                 0.876                0.965             0.772
+25       25     3.031           0.230     14.114        6.623      203.965  O_base  10  holdrule_both                  0.985               0.964                    0.985                 0.964                0.978             0.877
+27       25     0.780           0.081      7.462        5.283       31.333   P_off   5  holdrule_both                  0.981               0.968                    0.981                 0.968                0.978             0.863
+28       25     2.537           0.151     11.748        4.225       47.093   P_off  10  holdrule_both                  0.989               0.984                    0.988                 0.984                0.969             0.919
+
+== per-seq ratios ==
+O_base 5 cur MH_01:19.30;MH_02:7.95;MH_03:6.74;MH_04:44.09;MH_05:9.62
+O_base 10 cur MH_01:13.68;MH_02:9.15;MH_03:6.45;MH_04:184.94;MH_05:14.85
+P_off 5 cur MH_01:5.54;MH_02:13.13;MH_03:6.65;MH_04:32.63;MH_05:5.25
+P_off 10 cur MH_01:10.70;MH_02:20.68;MH_03:11.18;MH_04:49.05;MH_05:4.67
+O_base 5 caus_est MH_01:19.10;MH_02:7.88;MH_03:8.10;MH_04:64.06;MH_05:9.32
+O_base 10 caus_est MH_01:14.05;MH_02:9.10;MH_03:6.38;MH_04:205.82;MH_05:16.81
+P_off 5 caus_est MH_01:5.46;MH_02:10.02;MH_03:8.44;MH_04:31.96;MH_05:4.98
+P_off 10 caus_est MH_01:10.77;MH_02:21.93;MH_03:11.36;MH_04:47.04;MH_05:4.46
+O_base 5 caus_both MH_01:19.10;MH_02:7.88;MH_03:8.10;MH_04:64.89;MH_05:9.32
+O_base 10 caus_both MH_01:14.06;MH_02:9.10;MH_03:6.38;MH_04:207.64;MH_05:16.83
+P_off 5 caus_both MH_01:5.47;MH_02:9.93;MH_03:8.48;MH_04:31.47;MH_05:4.97
+P_off 10 caus_both MH_01:10.81;MH_02:22.07;MH_03:11.33;MH_04:47.12;MH_05:4.46
+O_base 5 holdrule_est MH_01:19.14;MH_02:7.99;MH_03:7.92;MH_04:63.62;MH_05:11.72
+O_base 10 holdrule_est MH_01:14.10;MH_02:9.25;MH_03:6.62;MH_04:204.50;MH_05:16.73
+P_off 5 holdrule_est MH_01:5.64;MH_02:9.92;MH_03:8.49;MH_04:31.84;MH_05:5.28
+P_off 10 holdrule_est MH_01:10.39;MH_02:22.38;MH_03:11.43;MH_04:47.00;MH_05:4.22
+O_base 5 holdrule_both MH_01:19.14;MH_02:7.99;MH_03:7.92;MH_04:64.23;MH_05:11.72
+O_base 10 holdrule_both MH_01:14.11;MH_02:9.26;MH_03:6.62;MH_04:203.96;MH_05:16.75
+P_off 5 holdrule_both MH_01:5.66;MH_02:9.92;MH_03:8.54;MH_04:31.33;MH_05:5.28
+P_off 10 holdrule_both MH_01:10.43;MH_02:22.53;MH_03:11.39;MH_04:47.09;MH_05:4.22

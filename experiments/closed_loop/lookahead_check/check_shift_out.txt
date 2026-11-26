@@ -1,0 +1,18 @@
+seq  i0  i1  n_win  len | L | mean|b_caus-b_cur| over outage (est mean, m/s2) | mean|b_cur| | |dbref| | frac outage frames where hold-rule differs | max |caus[j]-cur[j-200]| | mean end-pos shift est (m) cur->caus | same bref
+MH_01 30750 36180 1087 36385 | 5 | 0.0023 | 0.1561 | 8.69e-06 | 0.200 | 0.00e+00 | 0.0044 | 0.0001
+MH_01 30750 36180 1087 36385 | 10 | 0.0021 | 0.1561 | 1.07e-05 | 0.100 | 0.00e+00 | 0.0162 | 0.0006
+MH_01 30750 36180 1087 36385 | 20 | 0.0020 | 0.1561 | 1.44e-05 | 0.050 | 0.00e+00 | 0.0148 | 0.0032
+   boundary: first outage frame (L=20 or 10) ko - (i0+200) = 1230 (>0 means outage starts after first window completes)
+MH_02 25320 29790 895 29994 | 5 | 0.0020 | 0.1583 | 5.21e-06 | 0.200 | 0.00e+00 | 0.0026 | 0.0001
+MH_02 25320 29790 895 29994 | 10 | 0.0016 | 0.1581 | 6.91e-06 | 0.100 | 0.00e+00 | 0.0065 | 0.0004
+MH_02 25320 29790 895 29994 | 20 | 0.0017 | 0.1582 | 7.36e-06 | 0.050 | 0.00e+00 | 0.0122 | 0.0013
+   boundary: first outage frame (L=20 or 10) ko - (i0+200) = 270 (>0 means outage starts after first window completes)
+MH_03 22185 26100 784 26304 | 5 | 0.0065 | 0.1480 | 4.21e-06 | 0.200 | 0.00e+00 | 0.0095 | 0.0001
+MH_03 22185 26100 784 26304 | 10 | 0.0043 | 0.1476 | 6.32e-06 | 0.100 | 0.00e+00 | 0.0197 | 0.0004
+   boundary: first outage frame (L=20 or 10) ko - (i0+200) = 1715 (>0 means outage starts after first window completes)
+MH_04 16620 19555 588 19756 | 5 | 0.0061 | 0.1538 | 9.60e-06 | 0.200 | 0.00e+00 | 0.0089 | 0.0001
+MH_04 16620 19555 588 19756 | 10 | 0.0035 | 0.1529 | 8.74e-06 | 0.100 | 0.00e+00 | 0.0099 | 0.0004
+   boundary: first outage frame (L=20 or 10) ko - (i0+200) = 735 (>0 means outage starts after first window completes)
+MH_05 18710 22010 661 22215 | 5 | 0.0025 | 0.1476 | 6.81e-06 | 0.200 | 0.00e+00 | 0.0037 | 0.0001
+MH_05 18710 22010 661 22215 | 10 | 0.0022 | 0.1468 | 7.48e-06 | 0.100 | 0.00e+00 | 0.0278 | 0.0004
+   boundary: first outage frame (L=20 or 10) ko - (i0+200) = 1100 (>0 means outage starts after first window completes)

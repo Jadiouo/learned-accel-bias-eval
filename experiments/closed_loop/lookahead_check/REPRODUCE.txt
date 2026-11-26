@@ -1,0 +1,21 @@
+Lookahead (window-start vs window-end alignment of the injected bias estimate) check, Supplement Sec. S11.
+
+The closed-loop experiment holds each learned estimate from the start of its 1 s input window, so the estimate
+uses samples up to 1 s later. This folder repeats O_base and P_off at L = 5 and 10 s with the estimate applied
+from the end of its window (all 1026 sequence-estimator pairs, K = 5), and compares the ratios.
+
+Files
+  run.py              runs the window-end variant (about 2 h for the full P_off pool); produced out_O.csv,
+                      out_P.csv (a one-in-eight subset of the P_off estimators) and out_P_full.csv
+  lib.py              shared helpers (the unit-level summary is copied from ../analyze_3.py, which overwrites
+                      its CSV files when imported)
+  analyze.py          -> analyze_stdout.txt, summary_C.csv, A_ratio_compare.csv, A_rowwise_join.csv
+  analyze_P_full.py   -> summary_P_full.csv, analyze_P_full_stdout.txt (the P_off numbers in the paper)
+  check_shift.py      -> check_shift_out.txt (sanity check of the one-window shift)
+
+Re-running analyze.py and analyze_P_full.py reproduces their listed outputs byte for byte; they also read
+../pre_outage_long.csv, ../variants_long.csv and ../table3_ratio.csv. check_shift.py and run.py need the raw
+EuRoC data (see the top-level README). Paths are relative to this folder; experiments/closed_loop is the parent folder.
+
+  PY=euroc_full/.venv/bin/python   (any Python 3.9+ environment with requirements.txt)
+  CUDA_VISIBLE_DEVICES="" $PY -I analyze.py; $PY -I analyze_P_full.py; $PY -I check_shift.py

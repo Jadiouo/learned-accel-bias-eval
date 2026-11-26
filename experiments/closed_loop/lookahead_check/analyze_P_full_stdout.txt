@@ -1,0 +1,31 @@
+rows: 37800 | aligns: ['caus', 'caush', 'cur'] | cfg: ['P_off'] | L: [np.int64(5), np.int64(10), np.int64(20)] | estimators per seq: {'MH_01': 228, 'MH_02': 228, 'MH_03': 228, 'MH_04': 114, 'MH_05': 228}
+table3_ratio.csv columns: ['cfg', 'L', 'n_seq', 'n_units', 'ratio_med', 'ratio_med_lo', 'ratio_med_hi', 'ratio_iqr', 'ratio_iqr_lo', 'ratio_iqr_hi', 'ratio_rng', 'ratio_rng_lo', 'ratio_rng_hi', 'sdabs_over_common', 'sdabs_over_common_lo', 'sdabs_over_common_hi', 'common_m', 'common_m_lo', 'common_m_hi', 'median_delta_m', 'median_delta_m_lo', 'median_delta_m_hi', 'per_seq_min', 'per_seq_max']
+  cfg  L  n_seq  n_units  ratio_med  ratio_med_lo  ratio_med_hi  ratio_iqr  ratio_iqr_lo  ratio_iqr_hi  ratio_rng  ratio_rng_lo  ratio_rng_hi  sdabs_over_common  sdabs_over_common_lo  sdabs_over_common_hi  common_m  common_m_lo  common_m_hi  median_delta_m  median_delta_m_lo  median_delta_m_hi  per_seq_min  per_seq_max
+P_off  5      5       25     5.2238        2.6570       42.3166     4.2525        1.7529       12.6773     1.9966        1.1275        2.6325             0.0878                0.0357                0.1982    0.7800       0.5517       0.8972          0.1763             0.0180             0.2267       2.0149      46.5497
+P_off 10      5       25     4.2905        3.7931       71.5156     2.4294        2.1652       21.0506     1.6607        1.3582        4.9702             0.0920                0.0345                0.1724    2.5362       1.7707       3.4002          0.4127             0.0476             0.7466       3.4743      75.8617
+P_off 20      2       10     5.1231        5.1161        6.2144     3.0571        3.0416        3.7948     1.7682        1.4976        2.6747             0.0956                0.0853                0.1015    6.0608       6.0547       6.5596          1.1192             1.0555             1.1835       5.1161       6.2144
+
+[A] row match rerun vs stored: {'both': 12600, 'right_only': 120, 'left_only': 0}
+[A] estimators rows=12540: max|d delta|=3.343e-11 m, max|d abs|=1.705e-11 m
+[A] bref rows=60: max|d abs|=1.024e-11 m
+
+[B/C] full pool, P_off:
+                  align  L  n_units  shared_m  diff_m  ratio_med  ratio_iqr  ratio_rng  perseq_min_medratio  perseq_min_ratiomed argmin                                   perseq
+      cur (as in paper)  5       25    0.7800  0.1763     5.2238     4.2525     1.9966               2.0152               2.0149  MH_01 01:2.02;02:8.43;03:5.22;04:46.49;05:4.59
+      cur (as in paper) 10       25    2.5362  0.4127     4.2905     2.4294     1.6607               3.4760               3.4743  MH_03 01:3.81;02:7.40;03:3.48;04:75.99;05:4.00
+      cur (as in paper) 20       10    6.0608  1.1192     5.1231     3.0571     1.7682               5.1161               5.1161  MH_02                          01:6.21;02:5.12
+   causal est, bref cur  5       25    0.7800  0.1682     5.5264     4.0883     1.9933               2.0215               2.0208  MH_01 01:2.02;02:8.11;03:5.20;04:44.63;05:5.04
+   causal est, bref cur 10       25    2.5362  0.4158     4.1673     2.3495     1.5619               3.5650               3.5646  MH_03 01:3.78;02:7.46;03:3.56;04:73.74;05:3.85
+   causal est, bref cur 20       10    6.0608  1.1148     5.1335     3.0484     1.7797               5.1326               5.1200  MH_02                          01:6.25;02:5.13
+        causal est+bref  5       25    0.7802  0.1682     5.5329     4.0700     1.9888               2.0155               2.0148  MH_01 01:2.02;02:8.12;03:5.20;04:44.34;05:5.04
+        causal est+bref 10       25    2.5367  0.4171     4.1657     2.3460     1.5610               3.5638               3.5635  MH_03 01:3.77;02:7.45;03:3.56;04:73.64;05:3.85
+        causal est+bref 20       10    6.0593  1.1159     5.1343     3.0488     1.7801               5.1334               5.1208  MH_02                          01:6.23;02:5.13
+hold-rule est, bref cur  5       25    0.7800  0.1564     5.7367     4.1714     1.9964               2.0317               2.0310  MH_01 01:2.03;02:8.42;03:5.51;04:43.73;05:5.41
+hold-rule est, bref cur 10       25    2.5362  0.4170     4.0898     2.3572     1.5716               3.6121               3.6119  MH_03 01:3.77;02:7.18;03:3.61;04:74.18;05:3.78
+hold-rule est, bref cur 20       10    6.0608  1.0954     5.1694     3.0520     1.8059               5.1532               5.1404  MH_02                          01:6.46;02:5.15
+     hold-rule est+bref  5       25    0.7802  0.1565     5.7516     4.1562     1.9919               2.0256               2.0250  MH_01 01:2.03;02:8.45;03:5.49;04:43.60;05:5.41
+     hold-rule est+bref 10       25    2.5368  0.4183     4.0883     2.3559     1.5708               3.6109               3.6107  MH_03 01:3.76;02:7.18;03:3.61;04:74.51;05:3.77
+     hold-rule est+bref 20       10    6.0593  1.0966     5.1704     3.0496     1.8060               5.1543               5.1416  MH_02                          01:6.44;02:5.15
+
+[C] Spearman of per-run delta, current vs causal, per unit: median=0.9939 min=0.9883
+[C] relative change of delta (causal/current - 1): median=0.001, 5%=-0.089, 95%=0.102

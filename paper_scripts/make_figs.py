@@ -277,14 +277,18 @@ if __name__ == "__main__":
 
 # ------------------------------------------------------------------ Supplement tables (generated TeX)
 def supp_tables():
-    d = pd.read_csv(AC / "table_sources_regime_summary_gated.csv")
-    IABE = {"A": 0.06946, "B": 0.791}   # regime IABE medians (m), as in attitude_controls/REPORT.md table 2
+    d = pd.read_csv(AC / "table_sources_regime_summary_gated.csv")   # theta_med, gth_eps_med only (per-sequence ratios first, then median; B has 4 sequences)
+    ps = pd.read_csv(AC / "table_sources_by_regime_gated.csv")       # per-sequence leakage (regime, source, seq)
+    w = pd.read_csv(R / "euroc_full/results/metrics_wide.csv"); w["reg"] = w.run_id.str[0]
+    IABE = {r: float(w[w.reg == r].iabe_rot.median()) for r in "AB"}  # regime IABE medians (m), computed (0.069466 and 0.791333), not hard-coded
+    SEQ = {r: sorted(w[w.reg == r].eval_sequence.unique()) for r in "AB"}   # A: MH_01-05; B: MH_01, 02, 03, 05
+    leak_mult = lambda key, r: ps[(ps.regime == r) & (ps.source == key) & ps.seq.isin(SEQ[r])].leak.median() / IABE[r]   # numerator over the same sequences as the denominator
     rows = [("a_raw_gyro(paper)", "Raw gyro integration"), ("b_gyro-GT-bias(oracle)", "Oracle (GT gyro bias)"),
             ("s_gyro-bias-comp-99%", "Gyro bias 99\\% compensated"), ("s_gyro-bias-comp-90%", "Gyro bias 90\\% compensated"),
             ("s_gyro-bias-comp-50%", "Gyro bias 50\\% compensated"), ("c_static-mean-bias", "Static average"),
             ("d_mahony(kp=1,ki=0.05)", "Mahony ($k_p{=}1$, $k_i{=}0.05$)"), ("s_mahony(kp=5,ki=0.05)", "Mahony ($k_p{=}5$, $k_i{=}0.05$)"),
             ("e_mahony_gated(kp=1,ki=0.05)", "Gated Mahony")]
-    out = ["\\begin{table}[!t]", "\\caption{Full version of Table~III: gravity leakage by attitude source, including compensation variants (five-sequence medians). Leakage multiple = median leakage $\\div$ regime median IABE (A: 0.0695~m; B: 0.791~m).}",
+    out = ["\\begin{table}[!t]", "\\caption{Full version of Table~III: gravity leakage by attitude source, including compensation variants (medians over five sequences in regime~A and four in regime~B). Leakage multiple = median leakage $\\div$ regime median IABE (A: " + f"{IABE['A']:.4f}" + "~m; B: " + f"{IABE['B']:.3f}" + "~m).}",
            "\\label{tab:leakfull}", "\\centering", "\\footnotesize", "\\setlength{\\tabcolsep}{2.5pt}",
            "\\begin{tabular}{@{}lccc@{}}", "\\toprule",
            "Attitude source & $\\bar\\theta$ (\\textdegree) & Leakage/IABE (A / B) & $g\\bar\\theta/\\lVert\\boldsymbol\\varepsilon\\rVert$ (A / B) \\\\", "\\midrule"]
@@ -296,7 +300,7 @@ def supp_tables():
             t = f"{v:.1f}"
             return t[:-2] if (v >= 10 and t.endswith(".0")) else t
         th = f"{a.theta_med:.1f}" if a.theta_med >= 10 else (f"{a.theta_med:.2f}" if a.theta_med >= 0.5 or a.theta_med >= 1 else f"{a.theta_med:.3f}")
-        out.append(f"{lab} & {th} & {f1(a.leak_med / IABE['A'])} / {f1(b.leak_med / IABE['B'])} & {f2(a.gth_eps_med)} / {f2(b.gth_eps_med)} \\\\")
+        out.append(f"{lab} & {th} & {f1(leak_mult(key, 'A'))} / {f1(leak_mult(key, 'B'))} & {f2(a.gth_eps_med)} / {f2(b.gth_eps_med)} \\\\")
     out += ["\\bottomrule", "\\end{tabular}", "\\end{table}"]
     (Path(__file__).resolve().parent / "supp_table_leak.tex").write_text("\n".join(out) + "\n")
 

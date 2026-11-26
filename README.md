@@ -2,19 +2,21 @@
 
 Code and summary results for the paper
 
-> **MEMS Accelerometer Bias, Tilt, and the Position-Error Budget of Learned Bias Estimation**
+> **Open-Loop Trajectory Error Is a Weak Guide to Accelerometer-Bias Accuracy: Ranking Agreement, Tilt Leakage, and a Closed-Loop Error Budget on EuRoC**
 > Hao-Ting Ho. Manuscript in preparation (not yet submitted).
 
-The paper shows how a shared attitude (tilt) error leaks gravity into the accelerometer-bias evaluation, how large
-this leakage is for common attitude sources, and how much of the closed-loop position error after a GNSS outage is
-shared by all bias estimators rather than caused by the estimator choice. The repository exists so that reviewers and
-readers can re-derive the numbers in the paper. Table and figure numbers below follow the manuscript draft of 2026-11-06
+The paper asks whether open-loop trajectory error can tell which learned accelerometer-bias estimator is more
+accurate. On EuRoC, it compares the ranking by trajectory error with the ranking by bias error against the dataset's
+reference bias, measures how much gravity a tilt error leaks into the position error for several attitude sources, and
+estimates how much of the closed-loop position error after a simulated outage is shared by all bias estimators rather
+than caused by the estimator choice. The repository exists so that reviewers and
+readers can re-derive the numbers in the paper. Table and figure numbers below follow the manuscript version of 2026-11-26
 (Table I: setup; II: definitions; III: gravity leakage; IV: position-error budget; V: robustness).
 
 ## What is and is not in this repository
 
 Included: all source code, configs, the Kaggle kernel scripts used for training, the analysis scripts, and the small
-summary CSV files that the analysis scripts and the figure/number generators read (about 16 MB in total).
+summary CSV files that the analysis scripts and the figure/number generators read (about 39 MB in total).
 
 Not included (too large, or third-party data):
 
@@ -101,12 +103,13 @@ session). All analysis scripts run on a CPU; the slowest, `analysis_vicon/t3_var
 | Table IV and Fig. 2: closed-loop budget (C_abs, C_Delta) | `experiments/closed_loop/run_closed_loop.py`, `unify_table.py`, `eskf.py` | `consequences_long.csv`, `table_unified.csv` | raw data + `series.npz` |
 | Table V: shared-error / between-estimator ratio, variants P_est, P_off, O_q10, O_q01 | `run_pre_outage.py`, `analyze_3.py`, `ratio_ci.py`, `ci_seedmean.py` | `table3_ratio.csv`, `table3_state.csv`, `table_ratio_ci.csv`, `ci_seedmean.csv` | raw data + `series.npz` |
 | Shapley shares (Fig. 3), Spearman S1 | `decompose.py`, `summarize_decomp.py`, `analyze.py` | `table3_shapley.csv`, `decomp_summary.csv`, `table3_spearman.csv`, `scenario_stats.csv` | raw data |
+| Lookahead check: estimate applied from the end of its input window (supplement S11) | `experiments/closed_loop/lookahead_check/{run,analyze,analyze_P_full,check_shift}.py` (see `REPRODUCE.txt` there) | `summary_C.csv`, `summary_P_full.csv`, `A_ratio_compare.csv` | `out_*.csv` (included); `run.py` needs raw data + `series.npz` |
 | Gated-tilt variants (supplementary) | `run_gated.py`, `analyze_gated.py`, `sens_gated.py` | `table_gated*.csv`, `gated_consequences.csv` | raw data + `series.npz` |
 | InEKF robustness | `experiments/closed_loop/inekf/{harness,inekf,analysis,verdict}.py`, `test_inekf.py` | `inekf/out_inekf/*.csv` | raw data |
 | Fig. 4 direction agreement (split-half), fig. data | `verification/R-F_noncircular/rF_noncircular_stratified.py` | `part2_splithalf_agreement_stratified.csv` | summary CSVs only |
 | Seed instability (flip rate), Fig. 5 | `verification/R-B_scripts/tost_backfill.py` | `flip_rate.csv` | summary CSVs only |
 | Split-half reliability, resolution (MDE, seeds needed) | `verification/R-E_stats/rE_stats.py` | `verification/R-E_stats/*.csv` | summary CSVs only |
-| Mamba-exclusion sensitivity, MH (supplement S6; item (6) of S12): split-half agreement, Spearman ATE-IABE, flip rate and closed-loop ratio recomputed with the 11 deep methods and with the 10 without Mamba | `verification/mamba_exclusion/mamba_exclusion.py`, `mamba_pair_share.py` | `agreement.csv`, `spearman_ate_iabe.csv`, `flip.csv`, `distinguishable.csv`, `closed_loop.csv`, `mamba_pair_share.csv` | summary CSVs **plus** `experiments/closed_loop/{pre_outage_long,variants_long}.csv` (not included; produced by `run_pre_outage.py`, needs `series.npz`) |
+| Mamba-exclusion sensitivity, MH (supplement S6; item (6) of S12): split-half agreement, Spearman ATE-IABE, flip rate and closed-loop ratio recomputed with the 11 deep methods and with the 10 without Mamba | `verification/mamba_exclusion/mamba_exclusion.py`, `mamba_pair_share.py` | `agreement.csv`, `spearman_ate_iabe.csv`, `flip.csv`, `distinguishable.csv`, `closed_loop.csv`, `mamba_pair_share.csv` | summary CSVs, including `experiments/closed_loop/{pre_outage_long,variants_long}.csv` (produced by `run_pre_outage.py`) |
 | Same Mamba-exclusion check on V1/V2 (supplement S6; item (6) of S12) | `verification/mamba_exclusion_vicon/mamba_exclusion_vicon.py` | `agreement.csv`, `agreement_per_seq.csv`, `flip.csv`, `distinguishable.csv`, `closed_loop.csv`, `mamba_outlier_ratio.csv` | per-run `euroc_full/results_vicon/runs/*/metrics.json` (not included, from training), and `euroc_full/analysis_vicon/full_2026-10-23/{t1_ate_per_run_gated,t3_pre_outage_long,t3_variants_long}.csv` (not included; produced by `t1_leakage.py` and `t3_variants.py`, need `series.npz`) |
 | Learned vs. constant baseline | `verification/learned_vs_const.py` | `learned_vs_const.csv` | summary CSVs only |
 | Known-truth simulation | `experiments/sim_truth/{sim_truth,run_all,analyze}.py` | `results_tables.md`, `results_summary.json` | MH ground truth |
@@ -121,8 +124,8 @@ session). All analysis scripts run on a CPU; the slowest, `analysis_vicon/t3_var
   References such as "SDD section X" point to an internal design document that is not part of this repository.
 - `verification/R-B_scripts/tost_backfill.py` also looks for TUM-VI results (`euroc_full/results/tumvi`), which are not distributed here; the EuRoC part
   works from the included files. `configs/tumvi.yaml` is kept for completeness.
-- `make_figs.py` regenerates the four supplementary tables `supp_table_*.tex`; their captions and numeric content match the manuscript draft
-  of 2026-11-06 and come from the included CSV files.
+- `make_figs.py` regenerates the four supplementary tables `supp_table_*.tex`; their captions and numeric content match the manuscript version
+  of 2026-11-26 and come from the included CSV files.
 - Machine-specific absolute paths were replaced by paths relative to the repository root and the `EUROC_DATA_DIR` environment variable. Header
   comments in some CSV/JSON outputs show `<REPO>` where the original absolute path was.
 

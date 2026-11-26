@@ -1,0 +1,30 @@
+H0_unified_stats -- canonical direction-agreement table (one pipeline for every agreement rate printed in the paper and the supplement).
+
+Purpose: recomputes every direction agreement between a trajectory-error ranking and the bias-RMSE ranking with a single pipeline:
+all 252 5/5 seed splits, Benjamini-Hochberg pair selection on one half (paired t test, q = 0.05), agreement of the other half, pooled over the
+cases of a group, and 95% leave-one-sequence-out jackknife intervals with t quantiles (df = number of sequence clusters - 1). It also gives the same
+rates without the Mamba estimator, the seed-noise ceiling for 11 and for 10 estimators, and the rows of Fig. 2.
+canonical_agreement.csv is the table that paper_scripts/make_figs.py and paper_scripts/make_vicon_numbers.py read.
+
+All commands are run from the repository root. PY is any Python 3.9+ environment with requirements.txt installed
+(scipy, pandas, numpy). All scripts are CPU only; prefix with CUDA_VISIBLE_DEVICES="" if desired.
+  PY="python -I"
+Scripts resolve their paths from their own location, so the working directory does not matter. Nothing here needs raw data or series.npz files.
+
+Inputs (all in this repository): euroc_full/results/{metrics_wide,runs_index}.csv; experiments/attitude_controls/ate_per_run_gated.csv,
+  vqf/ate_per_run_vqf.csv, vqf/v2/ate_per_run_v2.csv; experiments/reviewer_checks/{F2_aligned_ate/ate_aligned_per_run.csv,
+  F5_scaled_attitude/ate_scaled_per_run.csv, F7_vicon_decomp/vicon_decomp_runs.csv, decomposition/f5_decomp_runs.csv};
+  euroc_full/analysis_vicon/full_2026-10-23/t1_ate_per_run_gated.csv.
+Commands (in this order):
+  $PY experiments/reviewer_checks/H0_unified_stats/01_reproduce.py          -> reproduce.csv (new pipeline: 0.559 [0.460, 0.657] for raw-attitude ATE, nine cases pooled; the earlier 1000-split pipeline gave 0.554 [0.444, 0.674])
+  $PY experiments/reviewer_checks/H0_unified_stats/02_canonical.py          -> canonical_core.csv, differences.csv (about 15 s)
+  $PY experiments/reviewer_checks/H0_unified_stats/03_ceiling.py K11 2000   -> ceiling_K11_N2000.csv (about 2 min; 11 estimators)
+  $PY experiments/reviewer_checks/H0_unified_stats/03_ceiling.py K10 2000   -> ceiling_K10_N2000.csv (10 estimators, without Mamba)
+  $PY experiments/reviewer_checks/H0_unified_stats/04_assemble.py           -> canonical_agreement.csv (the canonical table), ceiling_controls.csv
+  $PY experiments/reviewer_checks/H0_unified_stats/06_fig2.py               -> fig2_rows.csv
+03_ceiling.py K11 compares its first simulations bit by bit with ../F1_noise_ceiling/sim_agree_*.npy if those files exist (they are not stored in this repository).
+Seeds: K=11 ceiling np.random.default_rng([20261126, source (0 raw / 1 oracle), variant index]) (same as F1); K=10 default_rng([20261127, source, variant index]);
+  reproduction of the earlier pipeline default_rng(0). The 252-split enumeration and the jackknife use no random numbers.
+The logic is adapted from ../F1_noise_ceiling/common.py, ../F7_vicon_decomp/agree_lib.py, ../F1_noise_ceiling/simulate.py and reproduce.py (those files are not modified).
+Columns of canonical_agreement.csv: dataset, selector, measure, attitude_source, source_id, group, mamba (included/excluded = with/without Mamba),
+  point, lo, hi (interval clipped to [0, 1]; lo_raw, hi_raw unclipped), n_pairs (mean selected pairs per split), n_clusters, interval_type, note, clipped.

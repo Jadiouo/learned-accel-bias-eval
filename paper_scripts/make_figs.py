@@ -53,7 +53,7 @@ def fig1():
     arr(6.0, 6.2, 7.3, 5.0); arr(6.0, 3.1, 7.3, 4.2)
     ax.text(4.75, 7.75, "shared attitude: IABE\n(shared terms cancel)", fontsize=8, ha="center", va="center", color="#007A5A")
     ax.add_patch(Rectangle((3.4, 5.3), 2.7, 1.8, fill=False, ec=OI["green"], lw=1.2))
-    box(0.0, 0.0, 10.0, 1.2, "ESKF onset states (IV-C): different quantity", ls="--", fs=8)
+    box(0.0, 0.0, 10.0, 1.2, "ESKF onset states (IV-D): different quantity", ls="--", fs=8)
     save(fig, "fig1_error_flow.pdf")
 
 
@@ -123,9 +123,11 @@ _CHAIN = {}
 
 
 def chain_data():
-    """Numbers behind Fig. 4 and the supplementary tables S13-S16, read from the stored result files (nothing typed in).
+    """Numbers behind the supplementary tables S13-S16, read from the stored result files (nothing typed in).
     Agreement values use the 252-split enumeration of the F1 pipeline (all pairs selected on one seed half by bias RMSE, BH q=0.05);
-    95% CIs of the nine-case pool are leave-one-sequence-out jackknife intervals with t_4 quantiles (five sequence clusters)."""
+    95% CIs of the nine-case pool are leave-one-sequence-out jackknife intervals with t_4 quantiles (five sequence clusters).
+    The agreement values of Fig. 2 and of Table S14 are not computed here: they are read from the canonical table of
+    experiments/reviewer_checks/H0_unified_stats (see canon() below), so that every printed agreement has one source."""
     if _CHAIN:
         return _CHAIN
     import sys
@@ -158,52 +160,79 @@ def chain_data():
             d[src, v] = jk(mat(src, v))
         rot = [cm_pt for cm_pt in (jk(mat(src, f"rot{i}"))["pt"] for i in range(30))]
         d[src, "rot"] = dict(lo=min(rot), hi=max(rot), mean=float(np.mean(rot)), n=len(rot))
-    f4 = pd.read_csv(RC / "F4_seqcluster/f4_results.csv")
-    d["retest"] = float(f4[f4.source == "bias RMSE own retest / ALL"].point.iloc[0])
     ce = pd.read_csv(RC / "F1_noise_ceiling/results_ceiling_N2000.csv")
     ce = ce[(ce.version == "fixed_cases")]
     d["ceil"] = ce
     r = ce[(ce.source == "raw") & (ce.group == "ALL") & ce.variant.isin(["V1", "V2", "V3"])].ceil_median
     d["ceil_band"] = (float(r.min()), float(r.max()))
-    al = pd.read_csv(RC / "F2_aligned_ate/agreement_aligned.csv")
-    d["align"] = al[al.group == "ALL"].set_index("measure")
     d["align_mag"] = pd.read_csv(RC / "F2_aligned_ate/ate_magnitudes.csv")
     _CHAIN.update(d)
     return _CHAIN
 
 
+H0 = RC / "H0_unified_stats"
+_CAN = []
+
+
+def canon():
+    """Canonical agreement table (one pipeline for every printed agreement: all 252 seed splits, Benjamini-Hochberg pair selection on one half,
+    95% leave-one-sequence-out jackknife intervals with t quantiles, df = clusters - 1)."""
+    if not _CAN:
+        t = pd.read_csv(H0 / "canonical_agreement.csv", keep_default_na=False)
+        for k in ("point", "lo", "hi"):
+            t[k] = pd.to_numeric(t[k])
+        _CAN.append(t)
+    return _CAN[0]
+
+
+def can(measure, att, group="nine cases pooled", mamba="included", dataset="Machine Hall", selector="bias RMSE"):
+    t = canon()
+    x = t[(t.dataset == dataset) & (t.selector == selector) & (t.measure == measure) & (t.attitude_source == att)
+          & (t.group == group) & (t.mamba == mamba)]
+    assert len(x) == 1, (measure, att, group, mamba, len(x))
+    return x.iloc[0]
+
+
 def fig_agree():
-    c = chain_data()
-    al = c["align"].loc["a_raw_gyro(paper)|se3"]
+    """Fig. 2 of the main text. Filled marks: all 11 estimators; hollow marks: the same quantity without Mamba (fig2_rows.csv of H0)."""
+    f2 = pd.read_csv(H0 / "fig2_rows.csv").set_index("fig_row")
     r2 = lambda v: round(float(v), 2)
-    rows = [  # (label, kind, point/low, high, CI, colour)
-        ("bias RMSE retest", "pt", c["retest"], None, None, OI["grey"]),
-        ("IABE", "pt", c["raw", "I"]["pt"], None, (c["raw", "I"]["lo"], c["raw", "I"]["hi"]), OI["green"]),
-        ("ATE, leakage removed", "pt", c["raw", "noL"]["pt"], None, (c["raw", "noL"]["lo"], c["raw", "noL"]["hi"]), OI["green"]),
-        ("ATE, raw attitude", "pt", c["raw", "full"]["pt"], None, (c["raw", "full"]["lo"], c["raw", "full"]["hi"]), OI["blue"]),
-        ("leakage, random dir.", "band", c["raw", "rot"]["lo"], c["raw", "rot"]["hi"], None, OI["orange"]),
-        ("ATE, SE(3)-aligned", "pt", al.pooled_rate, None, (al.seqboot_lo, al.seqboot_hi), OI["pink"]),
-        ("ATE noise ceiling", "band", c["ceil_band"][0], c["ceil_band"][1], None, OI["sky"]),
+    rows = [  # (axis label, row label in fig2_rows.csv, kind, colour)
+        ("bias RMSE retest", "bias RMSE retest", "pt", OI["grey"]),
+        ("IABE", "IABE", "pt", OI["green"]),
+        ("ATE, leakage removed", "ATE, leakage removed", "pt", OI["green"]),
+        ("ATE, raw attitude", "ATE, raw attitude", "pt", OI["blue"]),
+        ("leakage, random dir.", "leakage, random dir. (band = range of 30)", "band", OI["orange"]),
+        ("ATE, SE(3)-aligned", "ATE, SE(3)-aligned", "pt", OI["pink"]),
+        ("ATE noise ceiling", "ATE noise ceiling (band = range of V1-V3 medians)", "band", OI["sky"]),
     ]
     fig, ax = plt.subplots(figsize=(W, 1.85))
-    for i, (lab, kind, v0, v1, ci, col) in enumerate(rows):
+    for i, (lab, key, kind, col) in enumerate(rows):
+        r = f2.loc[key]
         if kind == "pt":
-            if ci is not None:
-                ax.plot(ci, [i, i], color=col, lw=1.4, solid_capstyle="butt", zorder=2)
-            ax.scatter([v0], [i], s=26, color=col, ec="black", lw=0.5, zorder=3)
+            ax.plot([r.included_lo, r.included_hi], [i, i], color=col, lw=1.4, solid_capstyle="butt", zorder=2)
+            ax.scatter([r.excluded_point], [i], s=34, facecolor="white", edgecolor=col, lw=1.0, zorder=3)  # without Mamba: hollow, drawn first
+            ax.scatter([r.included_point], [i], s=26, color=col, ec="black", lw=0.5, zorder=4)          # all 11 estimators
         else:
-            ax.add_patch(Rectangle((v0, i - 0.28), v1 - v0, 0.56, fc=col, ec=col, alpha=0.55, lw=0.8, zorder=2))
+            ax.add_patch(Rectangle((r.included_lo, i - 0.28), r.included_hi - r.included_lo, 0.56, fc=col, ec=col, alpha=0.55, lw=0.8, zorder=2))
+            ax.add_patch(Rectangle((r.excluded_lo, i - 0.36), r.excluded_hi - r.excluded_lo, 0.72, fc="none", ec=col, lw=1.0, ls=(0, (2.5, 1.5)), zorder=3))
     ax.axvline(0.5, color=OI["grey"], lw=0.5, ls=":", zorder=1)
     ax.set_yticks(range(len(rows))); ax.set_yticklabels([r[0] for r in rows])
     ax.set_ylim(len(rows) - 0.4, -0.6)
     ax.set_xlim(0.25, 1.02); ax.set_xticks([0.25, 0.5, 0.75, 1.0])
     ax.set_xlabel("direction agreement (nine cases pooled)")
-    # step labels: the two drops of the chain, as differences of the rounded points
-    d1 = r2(c["retest"]) - r2(c["raw", "I"]["pt"]); d2 = r2(c["raw", "noL"]["pt"]) - r2(c["raw", "full"]["pt"])
+    # step labels: the two drops of the chain, as differences of the rounded points (all 11 estimators)
+    ret, iab, nol, raw = (f2.loc[k].included_point for k in ("bias RMSE retest", "IABE", "ATE, leakage removed", "ATE, raw attitude"))
+    d1 = r2(ret) - r2(iab); d2 = r2(nol) - r2(raw)
     ax.text(0.27, 0.5, f"double integration\n$-${d1:.2f}", fontsize=8, va="center", ha="left", color=OI["black"], linespacing=0.95,
             bbox=dict(fc="white", ec="none", pad=0.6))
     ax.text(0.635, 2.5, f"shared leakage term $-${d2:.2f}", fontsize=7.5, va="center", ha="left", color=OI["black"], linespacing=0.95,
             bbox=dict(fc="white", ec="none", pad=0.6))
+    # key: filled = all 11 estimators, hollow = without Mamba (placed in the free area left of the noise-ceiling band)
+    ax.scatter([0.275], [6.0], s=26, color=OI["black"], ec="black", lw=0.5, zorder=4, clip_on=False)
+    ax.text(0.30, 6.0, "all 11", fontsize=7.5, va="center", ha="left", bbox=dict(fc="white", ec="none", pad=0.4))
+    ax.scatter([0.452], [6.0], s=34, facecolor="white", edgecolor=OI["black"], lw=1.0, zorder=4, clip_on=False)
+    ax.text(0.482, 6.0, "without Mamba", fontsize=7.5, va="center", ha="left", bbox=dict(fc="white", ec="none", pad=0.4))
     for sp in ("top", "right"):
         ax.spines[sp].set_visible(False)
     ax.tick_params(axis="y", length=0)
@@ -438,19 +467,19 @@ def supp_tables_g():
     out += end
     (here / "supp_table_ceiling.tex").write_text("\n".join(out) + "\n")
 
-    # S14: aligned ATE (F2)
-    al, mg = c["align"], c["align_mag"]
+    # S14: aligned ATE (F2 medians; agreement from the canonical table of H0, one pipeline for all agreements)
+    mg = c["align_mag"]
     mg = mg[mg.regime == "ALL"].set_index("source")
-    out = top("Direction agreement and median ATE with and without alignment of the open-loop trajectory to the reference trajectory (nine cases pooled; 1000 random splits of the original pipeline, 95\\% sequence-cluster bootstrap CI). 4DoF: translation and yaw; SE(3): rigid transform.",
+    out = top("Direction agreement and median ATE with and without alignment of the open-loop trajectory to the reference trajectory (nine cases pooled; all 252 seed splits, 95\\% leave-one-sequence-out jackknife CI with $t_4$ quantiles). 4DoF: translation and yaw; SE(3): rigid transform.",
               "tab:align", "llcc", "4pt")
     out += ["Attitude & Alignment & Median ATE (m) & Agreement [95\\% CI] \\\\", "\\midrule"]
-    out.append(f"bias RMSE & retest & --- & {al.loc['bias_rmse'].pooled_rate:.3f} [{al.loc['bias_rmse'].seqboot_lo:.3f}, {al.loc['bias_rmse'].seqboot_hi:.3f}] \\\\")
-    out.append(f"IABE (reference attitude) & --- & {mg.loc['a_raw_gyro(paper)'].iabe_rot_median:.3f} & {al.loc['iabe_rot'].pooled_rate:.3f} [{al.loc['iabe_rot'].seqboot_lo:.3f}, {al.loc['iabe_rot'].seqboot_hi:.3f}] \\\\")
-    for key, sl in (("a_raw_gyro(paper)", "raw"), ("b_gyro-GT-bias(oracle)", "oracle")):
-        for tag, tl, col in (("none", "none", "ate_none_median"), ("4dof", "4DoF", "ate_4dof_median"), ("se3", "SE(3)", "ate_se3_median")):
-            r = al.loc[f"{key}|{tag}"]
+    cell = lambda r: f"{r.point:.3f} [{r.lo:.3f}, {r.hi:.3f}]"
+    out.append(f"bias RMSE & retest & --- & {cell(can('bias RMSE own retest', 'not applicable'))} \\\\")
+    out.append(f"IABE (reference attitude) & --- & {mg.loc['a_raw_gyro(paper)'].iabe_rot_median:.3f} & {cell(can('IABE', 'reference attitude'))} \\\\")
+    for key, sl, att in (("a_raw_gyro(paper)", "raw", "raw"), ("b_gyro-GT-bias(oracle)", "oracle", "oracle")):
+        for tl, col, meas in (("none", "ate_none_median", "ATE"), ("4DoF", "ate_4dof_median", "ATE aligned 4DoF"), ("SE(3)", "ate_se3_median", "ATE aligned SE(3)")):
             m = mg.loc[key][col]
-            out.append(f"{sl} & {tl} & {m:.2f} & {r.pooled_rate:.3f} [{r.seqboot_lo:.3f}, {r.seqboot_hi:.3f}] \\\\")
+            out.append(f"{sl} & {tl} & {m:.2f} & {cell(can(meas, att))} \\\\")
     out += end
     (here / "supp_table_align.tex").write_text("\n".join(out) + "\n")
 
@@ -535,6 +564,159 @@ def supp_tables_g():
     (here / "supp_table_overwrite.tex").write_text("\n".join(out) + "\n")
     c["overwrite"] = tc
 
+    # S17: what the learned estimators learn (F8; post hoc, sequence-internal)
+    F8 = RC / "F8_what_is_learned"
+    DLM = ["tcn", "transformer_s", "transformer_m", "transformer_l", "mamba", "m1_cnn", "m2", "m3_lstm", "m4", "m5", "m6"]
+    se = pd.read_csv(F8 / "stats_enriched.csv"); se = se[se.method.isin(DLM)].copy()
+    se["fl_over_sig"] = se.fl / se.sig_ref
+    ic = pd.read_csv(F8 / "item1_case.csv")
+    ip = pd.read_csv(F8 / "item4_pairs.csv").set_index(["subset", "group"])
+    ia = pd.read_csv(F8 / "item6_agree.csv").set_index(["subset", "metric", "group"])
+    GR = (("A", "A"), ("B", "B"), ("ALL", "nine"))
+    sub = lambda g: se if g == "ALL" else se[se.regime == g]
+    cs = lambda g: ic if g == "ALL" else ic[ic.regime == g]
+    mi = lambda v: v.replace("-", "$-$")
+    ret = "bias RMSE (own retest, ceiling)"; off = "offset-only (b_hat -> window mean)"
+    out = top("What the bias error measures in the evaluation windows (post hoc; 990 deep-estimator runs: 11 methods, ten seeds, nine cases). Medians over runs unless stated. $\\sigma_{\\mathrm{ref}}$: time standard deviation of the reference bias in the window; median bias RMSE: of the deep estimators in the case (median over cases). Fluctuation: output variation around the window mean. Skill: one minus the squared fluctuation error over the variance of the reference bias (a constant has 0). Offset share: share of the squared-error difference of the distinguishable pairs that is offset. Window-mean agreement: agreement with the bias-RMSE ranking when each estimate is replaced by its window mean; bound: own-retest agreement of bias RMSE.",
+              "tab:learned", ">{\\raggedright\\arraybackslash}p{0.43\\columnwidth}ccc", "3pt")
+    out += ["Quantity & A & B & Nine cases \\\\", "\\midrule"]
+    row = lambda lab, f: out.append(f"{lab} & " + " & ".join(f(g) for g, _ in GR) + " \\\\")
+    row("$\\sigma_{\\mathrm{ref}}$ / median bias RMSE (median over cases)", lambda g: f"{cs(g).sig_over_rmse.median():.3f}")
+    row("Fluctuation share of squared bias RMSE", lambda g: f"{sub(g).share_fl.median():.2f}")
+    row("Fluctuation $/\\,\\sigma_{\\mathrm{ref}}$", lambda g: f"{sub(g).fl_over_sig.median():.0f}")
+    row("Correlation with the reference, means removed", lambda g: mi(f"{sub(g).corr_all.median():.2f}"))
+    row("Runs with skill above 0", lambda g: f"{int((sub(g).skill > 0).sum())} of {len(sub(g))}")
+    out.append("\\midrule")
+    row("Offset share, all 11 methods", lambda g: f"{ip.loc[('with Mamba', g)].offset_share:.2f}")
+    row("Offset share, without Mamba", lambda g: f"{ip.loc[('without Mamba', g)].offset_share:.2f}")
+    row("Window-mean agreement, all 11", lambda g: f"{ia.loc[('with Mamba', off, g)].agree:.3f}")
+    GMAP = {"A": "regime A", "B": "regime B", "ALL": "nine cases pooled"}
+    def cb(g, m):
+        t = canon()
+        return t[(t.measure == "bias RMSE own retest") & (t.dataset == "Machine Hall") & (t.mamba == m) & (t.group == GMAP[g])].point.iloc[0]
+    row("\\quad bound", lambda g: f"{cb(g, 'included'):.3f}")
+    row("Window-mean agreement, without Mamba", lambda g: f"{ia.loc[('without Mamba', off, g)].agree:.3f}")
+    row("\\quad bound", lambda g: f"{cb(g, 'excluded'):.3f}")
+    out += end
+    (here / "supp_table_learned.tex").write_text("\n".join(out) + "\n")
+    c["learned"] = dict(n=len(se), nA=int((se.regime == "A").sum()), nB=int((se.regime == "B").sum()),
+                        sig_lo=float(ic.sigma_ref.min()), sig_hi=float(ic.sigma_ref.max()),
+                        skill_pos=int((se.skill > 0).sum()), mean_diff=float(pd.read_csv(F8 / "item1_A_vs_B_mean.csv").diff_rms.abs().max()))
+
+
+# ------------------------------------------------------------------ Supplement S18-S19 (open-loop dose response; offset as the reference ranking)
+F9 = RC / "F9_openloop_dose"
+F10 = RC / "F10_offset_reference"
+_F9SRC = [("oracle", "oracle", OI["black"], "-"), ("static", "static avg", OI["orange"], "-"), ("mahony", "Mahony", OI["pink"], "-"),
+          ("vqf", "VQF", OI["green"], "-"), ("gmahony", "gated Mahony", OI["blue"], "-"), ("raw", "raw", OI["verm"], "-")]
+
+
+def fig_openloop():
+    """Fig. S (S18): agreement of ATE with the bias-RMSE order for two synthetic constant estimators whose bias RMSE differs by Delta
+    (mode C-pool, nine cases pooled; read from dose_curves_pooled.csv of F9)."""
+    d = pd.read_csv(F9 / "dose_curves_pooled.csv")
+    d = d[(d["mode"] == "C-pool") & (d.group == "nine cases")]
+    pr = pd.read_csv(RC / "F3_dose_response/pool_runs_summary.csv")
+    pool_med = float(pr[pr.L == 10].bias_rmse_avg.median())          # 2.8e-3, as in S15 (1026 runs)
+    fig, ax = plt.subplots(figsize=(W, 2.45))
+    for key, lab, col, ls in _F9SRC:
+        x = d[d.source == key].sort_values("dx")
+        if key in ("raw", "oracle"):
+            ax.fill_between(x.dx, x.jk_lo.clip(0, 1), x.jk_hi.clip(0, 1), color=col, alpha=0.12, lw=0, zorder=1)
+        ax.plot(x.dx, x.agree, color=col, ls=ls, lw=1.6 if key in ("raw", "oracle") else 1.1, label=lab, zorder=3)
+    x = d[d.source == "IABE"].sort_values("dx")
+    ax.plot(x.dx, x.agree, color=OI["grey"], ls="--", lw=1.4, label="IABE", zorder=2)
+    for xv, lab in ((1e-2, "0.01"), (pool_med, "pool median")):
+        ax.axvline(xv, color=OI["grey"], lw=0.6, ls=":", zorder=0)
+        ax.text(xv * 0.88, 0.265, lab, rotation=90, ha="right", va="bottom", fontsize=7, color="#444444")
+    ax.set_xscale("log"); ax.set_xlim(1e-4, 10); ax.set_ylim(0.25, 1.02)
+    ax.set_xlabel("difference $\\Delta$ of bias RMSE between two estimators (m/s$^2$)")
+    ax.set_ylabel("P(ATE order = bias-RMSE order)")
+    ax.axhline(0.5, color=OI["grey"], lw=0.5, ls=":", zorder=0)
+    for sp in ("top", "right"):
+        ax.spines[sp].set_visible(False)
+    ax.legend(frameon=False, fontsize=7, ncol=4, loc="lower center", bbox_to_anchor=(0.46, 1.0), columnspacing=1.0, handlelength=1.6)
+    fig.subplots_adjust(left=0.15, right=0.985, bottom=0.18, top=0.86)
+    save(fig, "figS_openloop.pdf")
+
+
+def supp_tables_i():
+    here = Path(__file__).resolve().parent
+    e = lambda v: f"{v:.1e}".replace("e-0", "\\times10^{-").replace("e-", "\\times10^{-") + "}"
+    top = lambda cap, lab, cols, tc="3pt", env="table": [f"\\begin{{{env}}}[!t]", f"\\caption{{{cap}}}", f"\\label{{{lab}}}", "\\centering", "\\scriptsize",
+                                                       f"\\setlength{{\\tabcolsep}}{{{tc}}}", f"\\begin{{tabular}}{{@{{}}{cols}@{{}}}}", "\\toprule"]
+
+    # ---- S18: open-loop dose response (F9)
+    s = pd.read_csv(F9 / "dose_summary.csv"); s = s[(s["mode"] == "C-pool") & (s.group == "nine cases")].set_index("source")
+    lk = pd.read_csv(F9 / "leakage_by_source.csv").set_index("source")
+    sl = s.drop(index="IABE").join(lk[["g_theta_median"]], how="inner")
+    sl = sl[sl.index.isin([k for k, *_ in _F9SRC] + ["comp50", "comp90", "comp99", "orc30", "orc10", "orc03"])]
+    slope = float(np.polyfit(np.log10(sl.g_theta_median), np.log10(sl.cross_0p8), 1)[0])
+    print(f"S18: log-log slope of Delta_0.8 against g*theta over {len(sl)} sources = {slope:.2f}")
+    out = top("Open-loop dose response with synthetic constant estimators (post hoc; nine cases pooled, mode C-pool). $g\\bar\\theta$: median over the nine cases of the mean tilt error expressed as acceleration (m/s$^2$). $\\Delta_{0.8}$: smallest bias-RMSE difference (m/s$^2$) from which the agreement stays at or above 0.8. Last two columns: agreement at the median bias RMSE of the 1026 runs ($2.8\\times10^{-3}$) and at $0.01$ [95\\% leave-one-sequence-out jackknife CI, $t_4$, clipped to $[0,1]$]. IABE: reference attitude.",
+              "tab:openloop", "lcccccc", "2.5pt", "table*")
+    out += ["Attitude source & $g\\bar\\theta$ & $\\Delta_{0.8}$ & $\\Delta_{0.8}/0.01$ & at $2.8\\times10^{-3}$ & at $0.01$ & CI \\\\", "\\midrule"]
+    s2 = lambda v: f"{v:#.2g}" if v < 10 else f"{round(v, -1) if v >= 100 else round(v):.0f}"
+    for key, lab, *_ in _F9SRC:
+        r = s.loc[key]
+        out.append(f"{lab} & {lk.loc[key].g_theta_median:.3f} & {s2(r.cross_0p8)} & {s2(r.cross_0p8 / 0.01)} & {r['agree@2.8e-3']:.2f} & {r['agree@1e-2']:.2f} & "
+                   f"[{max(r['jk_lo@1e-2'], 0):.2f}, {min(r['jk_hi@1e-2'], 1):.2f}] \\\\")
+    r = s.loc["IABE"]
+    out.append("\\midrule")
+    out.append(f"IABE & --- & $\\le{e(r.cross_0p8)}$ & --- & {r['agree@2.8e-3']:.3f} & {r['agree@1e-2']:.3f} & [{max(r['jk_lo@1e-2'], 0):.3f}, {min(r['jk_hi@1e-2'], 1):.3f}] \\\\")
+    out += ["\\bottomrule", "\\end{tabular}", "\\end{table*}"]
+    (here / "supp_table_openloop.tex").write_text("\n".join(out) + "\n")
+    rp = json.load(open(F9 / "real_pair_scale.json"))
+    print(f"S18: real pairs {rp['n_pairs']}, median |Delta| {rp['median']:.1e}, share above 0.01 {rp['frac_above_0p01']:.3f}")
+
+    # ---- S19: offset as the reference ranking (F10)
+    t = pd.read_csv(F10 / "offset_reference_agreement.csv", keep_default_na=False)
+    for k in ("point", "lo", "hi", "bias_rmse_ref_value", "bias_rmse_ref_lo", "bias_rmse_ref_hi", "n_pairs", "bias_rmse_ref_n_pairs"):
+        t[k] = pd.to_numeric(t[k])
+    def g(meas, att, grp, mam):
+        x = t[(t.measure == meas) & (t.attitude_source == att) & (t.group == grp) & (t.mamba == mam)]
+        assert len(x) == 1, (meas, att, grp, mam, len(x))
+        return x.iloc[0]
+    c1 = lambda v, lo, hi: f"{v:.2f} [{max(lo, 0):.2f}, {min(hi, 1):.2f}]"
+    def cell(r, ref):
+        if ref == "off":
+            if r.interval_type.startswith("range"):
+                return f"{r.point:.2f} ({r.lo:.2f}--{r.hi:.2f})"
+            return c1(r.point, r.lo, r.hi)
+        if r.interval_type.startswith("range"):
+            return f"{r.bias_rmse_ref_value:.2f} ({r.bias_rmse_ref_lo:.2f}--{r.bias_rmse_ref_hi:.2f})"
+        return c1(r.bias_rmse_ref_value, r.bias_rmse_ref_lo, r.bias_rmse_ref_hi)
+    NINE = "nine cases pooled"
+    out = top("Direction agreement when the reference ranking is the window-mean offset of the bias error and when it is bias RMSE (post hoc; Machine Hall, nine cases pooled unless a regime is named, same 252 seed splits, pair selection and jackknife CI as in Sec.~\\ref{sec:s-stats}; CI clipped to $[0,1]$; for the random-direction rows, median and range of 30 draws). With Mamba: all 11 estimators; without: 10. Last row: mean number of distinguishable pairs per split.",
+              "tab:offsetref", "lcccc", "3pt", "table*")
+    out += ["& \\multicolumn{2}{c}{All 11 estimators} & \\multicolumn{2}{c}{Without Mamba} \\\\", "\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}",
+            "Measure & Offset reference & Bias-RMSE reference & Offset reference & Bias-RMSE reference \\\\", "\\midrule"]
+    def row(lab, meas, att, grp=NINE):
+        a, b = g(meas, att, grp, "included"), g(meas, att, grp, "excluded")
+        out.append(f"{lab} & {cell(a, 'off')} & {cell(a, 'br')} & {cell(b, 'off')} & {cell(b, 'br')} \\\\")
+    row("Own retest of the reference ranking (upper bound)", "offset own retest (upper bound)", "not applicable")
+    row("IABE", "IABE", "reference attitude")
+    row("ATE, raw attitude", "ATE", "raw")
+    row("ATE, oracle attitude", "ATE", "oracle")
+    row("ATE without the shared leakage term, raw", "ATE without shared leakage term", "raw")
+    row("ATE without the shared leakage term, oracle", "ATE without shared leakage term", "oracle")
+    row("ATE with the leakage term reversed, raw", "ATE with leakage sign reversed", "raw")
+    row("ATE with the leakage term in random directions, raw", "ATE with leakage in random directions", "raw")
+    out.append("\\midrule")
+    row("Bias-RMSE ranking as the measure", "bias RMSE (as measure)", "not applicable")
+    row("Fluctuation ranking as the measure", "fluctuation (as measure)", "not applicable")
+    out.append("\\midrule")
+    for lab, grp in (("regime A", "regime A"), ("regime B", "regime B")):
+        row(f"ATE, raw attitude, {lab}", "ATE", "raw", grp)
+        row(f"ATE without the shared leakage term, raw, {lab}", "ATE without shared leakage term", "raw", grp)
+    out.append("\\midrule")
+    a, b = g("IABE", "reference attitude", NINE, "included"), g("IABE", "reference attitude", NINE, "excluded")
+    out.append(f"Distinguishable pairs per split & {a.n_pairs:.1f} & {a.bias_rmse_ref_n_pairs:.1f} & {b.n_pairs:.1f} & {b.bias_rmse_ref_n_pairs:.1f} \\\\")
+    out += ["\\bottomrule", "\\end{tabular}", "\\end{table*}"]
+    (here / "supp_table_offsetref.tex").write_text("\n".join(out) + "\n")
+
 
 if __name__ == "__main__":
     supp_tables_g()
+    fig_openloop()
+    supp_tables_i()

@@ -1,0 +1,25 @@
+F8_what_is_learned -- Supplement S17 (post hoc): what the bias error measures in the evaluation windows, and what the learned estimators learn.
+
+Purpose: splits the squared bias error of each deep estimator into an offset part (distance of the window-mean estimate from the window-mean
+reference bias) and a fluctuation part (output variation around the window mean versus the reference variation), reports how much the reference
+bias varies in the windows, how well the estimators track it (skill, correlation), which share of the squared-error difference of the
+distinguishable pairs is offset, and the direction agreement with the bias-RMSE ranking when each estimate is replaced by its window mean
+(or by its fluctuation only). Results are with and without the Mamba estimator.
+
+All commands are run from the repository root. PY is any Python 3.9+ environment with requirements.txt installed (scipy, pandas, numpy).
+All scripts are CPU only; prefix with CUDA_VISIBLE_DEVICES="" if desired.
+  PY="python -I"
+Scripts resolve their paths from their own location, so the working directory does not matter.
+Raw inputs not in this repository: the per-run euroc_full/results/runs/*/series.npz files (obtained by re-training, see top-level README). They are
+needed only by extract_stats.py; stats_per_run.csv, which it writes, is stored here, so the other scripts run from the stored csv files.
+
+Inputs: euroc_full/results/{runs_index.csv, metrics_wide.csv}, experiments/reviewer_checks/F1_noise_ceiling/common.py (imported, not modified), and
+  runs/*/series.npz for extract_stats.py only.
+Commands (in this order; the scripts print their results to the terminal):
+  $PY experiments/reviewer_checks/F8_what_is_learned/extract_stats.py   -> stats_per_run.csv (1026 run x sequence rows; needs series.npz)
+  $PY experiments/reviewer_checks/F8_what_is_learned/analysis_a.py      -> stats_enriched.csv, item1_case.csv, item1_A_vs_B_mean.csv, item23_by_method.csv (items 1-3)
+  $PY experiments/reviewer_checks/F8_what_is_learned/analysis_b.py      -> item4_pairs.csv, item6_agree.csv (items 4-6; also reproduces the earlier 0.554 and a permutation control)
+  $PY experiments/reviewer_checks/F8_what_is_learned/analysis_c.py      (prints fluctuation relative to the reference variation and relative to a constant baseline; writes nothing)
+Seeds: the permutation control in analysis_b.py uses default_rng(0); everything else is deterministic (all 252 splits are enumerated).
+The agreement pipeline is ../F1_noise_ceiling/common.py (252 splits, BH pair selection, leave-one-sequence-out jackknife with t quantiles).
+supp_table_learned.tex (paper_scripts/make_figs.py) reads stats_enriched.csv, item1_case.csv, item1_A_vs_B_mean.csv, item4_pairs.csv and item6_agree.csv.

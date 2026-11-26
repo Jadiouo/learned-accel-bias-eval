@@ -1,0 +1,21 @@
+F10 -- direction agreement when the reference ranking is the window-mean offset of the bias error (supplement S19; post hoc).
+CPU only, single process, about 1 minute; no random numbers (all 252 seed splits are enumerated; the jackknife is deterministic; the 30 random rotations
+are the columns already stored in decomposition/f5_decomp_runs.csv).
+
+Run from the repository root. PY is a Python 3.9+ environment with requirements.txt installed (numpy, scipy, pandas).
+  PY="python -I"
+  $PY experiments/reviewer_checks/F10_offset_reference/01_offset_agreement.py > out.txt     (the printed tables are not stored)
+  -> offset_reference_agreement.csv (204 rows; offset as the reference), per_unit_agreement.csv (per case: number of separable pairs and agreement)
+Scripts resolve their paths from their own location, so the working directory does not matter. Nothing here needs raw data or series.npz files.
+
+Reproduction check inside the program (assert): the same code is run once more with bias RMSE as the reference and compared row by row with the 186 rows
+(Machine Hall, selector = bias RMSE) of H0_unified_stats/canonical_agreement.csv; point and n_pairs differ by at most 0.0. Raw-attitude ATE, nine cases,
+11 estimators = 0.5586 [0.460, 0.657]. Also checked: rmse_avg of F8 stats_per_run.csv equals bias_rmse_avg of metrics_wide.csv exactly; sqrt(off2 + fl2) equals
+rmse_avg to a relative difference of 6.7e-14.
+
+Inputs (read only, all in this repository): H0_unified_stats/{lib.py, canonical_agreement.csv}; F8_what_is_learned/stats_per_run.csv;
+euroc_full/results/{metrics_wide,runs_index}.csv; experiments/attitude_controls/{ate_per_run_gated.csv, vqf/ate_per_run_vqf.csv, vqf/v2/ate_per_run_v2.csv};
+experiments/reviewer_checks/decomposition/f5_decomp_runs.csv.
+Scope: Machine Hall only (regime A: 5 cases, regime B: 4 cases). Not done: Vicon (F8 has no offset statistics for Vicon), SE(3)-aligned ATE, the synthetic
+rescaling of F5, a simulated noise ceiling for the offset (the canonical ceiling is simulated with bias RMSE as the reference).
+Columns follow canonical_agreement.csv (old_value is empty), plus bias_rmse_ref_{value,lo,hi,n_pairs,source} and delta_vs_bias_rmse_ref; the selector column is always "offset".

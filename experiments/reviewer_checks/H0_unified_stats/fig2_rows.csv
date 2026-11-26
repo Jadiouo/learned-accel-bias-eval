@@ -1,0 +1,8 @@
+fig_row,included_point,included_lo,included_hi,included_interval_type,excluded_point,excluded_lo,excluded_hi,excluded_interval_type
+bias RMSE retest,0.9873754749154875,0.9771862632465088,0.9975646865844662,jackknife t (leave-one-sequence-out),0.9810966373826113,0.9670015764421312,0.9951916983230914,jackknife t (leave-one-sequence-out)
+IABE,0.8023753253358064,0.7040707572774134,0.9006798933941993,jackknife t (leave-one-sequence-out),0.9407452287185701,0.884617571687886,0.9968728857492543,jackknife t (leave-one-sequence-out)
+"ATE, leakage removed",0.7986956651808418,0.6868927767555003,0.9104985536061833,jackknife t (leave-one-sequence-out),0.9389881853983642,0.8850495106474121,0.9929268601493162,jackknife t (leave-one-sequence-out)
+"ATE, raw attitude",0.5586202770215694,0.4599833224609525,0.6572572315821862,jackknife t (leave-one-sequence-out),0.460466525295365,0.2364615186327968,0.6844715319579333,jackknife t (leave-one-sequence-out)
+"leakage, random dir. (band = range of 30)",0.5033805007927723,0.3628803063391869,0.6127082897059264,range over 30 random rotations (point = median),0.49294153286882764,0.32462890033323233,0.6728870039382006,range over 30 random rotations (point = median)
+"ATE, SE(3)-aligned",0.5500344033266521,0.4450129140200703,0.6550558926332339,jackknife t (leave-one-sequence-out),0.4536807028173281,0.22903409176005166,0.6783273138746045,jackknife t (leave-one-sequence-out)
+ATE noise ceiling (band = range of V1-V3 medians),0.8043198611900559,0.8038860801148773,0.8464414993867233,range of the three variants' medians (Fig. 2 band); point = median of the three,0.8515298394425932,0.826113299000303,0.8950015146925174,range of the three variants' medians (Fig. 2 band); point = median of the three

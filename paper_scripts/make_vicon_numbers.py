@@ -149,15 +149,25 @@ M("VcSpAbsIabe", fmt(spc("abs", "iabe")["s1_median"], 2), s + ", cons=abs pred=i
 M("VcSpAbsBias", fmt(spc("abs", "bias_rmse")["s1_median"], 2), s + ", cons=abs pred=bias_rmse, col s1_median")
 M("VcSpCells", spc("delta", "iabe")["n_cells"], s + ", col n_cells")
 
-# ---------- direction agreement (R-F)
-rf = {x["measure"]: x for x in rd("rf_splithalf_agreement.csv") if x["group"] == "ALL"}
-H("direction agreement with bias-RMSE ranking, all six sequences (rf_splithalf_agreement.csv, group=ALL)")
-for tag, m in (("Raw", "ATE:a_raw_gyro(paper)"), ("Oracle", "ATE:b_gyro-GT-bias(oracle)"), ("Iabe", "IABE"),
-               ("Ceil", "bias_rmse (自身重測上限)")):
-    s = f"{SRC}/rf_splithalf_agreement.csv, group=ALL, measure={m}"
-    M(f"VcAgr{tag}", fmt(rf[m]["pooled_rate"], 3), s + ", col pooled_rate")
-    M(f"VcAgr{tag}Lo", fmt(rf[m]["seqboot_lo"], 3), s + ", col seqboot_lo")
-    M(f"VcAgr{tag}Hi", fmt(rf[m]["seqboot_hi"], 3), s + ", col seqboot_hi")
+# ---------- direction agreement (canonical table of experiments/reviewer_checks/H0_unified_stats)
+# These macros used to be computed from rf_splithalf_agreement.csv (the original 1000-split / sequence-bootstrap pipeline).
+# That pipeline is superseded: every printed agreement now comes from canonical_agreement.csv (all 252 splits,
+# leave-one-sequence-out jackknife intervals with t quantiles). rf_splithalf_agreement.csv is no longer read.
+CANON = Path(__file__).resolve().parents[1] / "experiments/reviewer_checks/H0_unified_stats/canonical_agreement.csv"
+with open(CANON) as f:
+    canon = list(csv.DictReader(f))
+H("direction agreement with bias-RMSE ranking, all six sequences (canonical_agreement.csv of H0_unified_stats; replaces rf_splithalf_agreement.csv, 2026-11-27)")
+for tag, ms, att in (("Raw", "ATE", "raw"), ("Oracle", "ATE", "oracle"), ("Iabe", "IABE", "reference attitude"),
+                     ("Ceil", "bias RMSE own retest", "not applicable")):
+    rows = [x for x in canon if x["dataset"] == "Vicon rooms" and x["group"] == "six sequences (regime A)" and x["mamba"] == "included"
+            and x["selector"] == "bias RMSE" and x["measure"] == ms and x["attitude_source"] == att]
+    assert len(rows) == 1, (ms, att, len(rows))
+    s = (f"experiments/reviewer_checks/H0_unified_stats/canonical_agreement.csv, dataset=Vicon rooms, group=six sequences (regime A), "
+         f"mamba=included, measure={ms}, attitude_source={att}")
+    t = "(252 splits, leave-one-sequence-out jackknife t, df=5)"
+    M(f"VcAgr{tag}", fmt(rows[0]["point"], 3), s + ", col point " + t)
+    M(f"VcAgr{tag}Lo", fmt(rows[0]["lo"], 3), s + ", col lo " + t)
+    M(f"VcAgr{tag}Hi", fmt(rows[0]["hi"], 3), s + ", col hi " + t)
 
 # ---------- rho(ATE ranking, IABE ranking) within sequence
 rho = rd("seed_rho_vs_iabe.csv")

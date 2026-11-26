@@ -1,0 +1,23 @@
+F9 -- open-loop dose response with synthetic offsets (supplement S18; post hoc).
+Seeds: pair draws default_rng([20261126, case_index]); direction bootstrap 20261126. CPU only, about 15 s in total.
+
+Run from the repository root. PY is a Python 3.9+ environment with requirements.txt installed (numpy, scipy, pandas, matplotlib);
+step 01 and 02b also need EuRoC raw data and `series.npz` of the runs, and the `vqf` package (pip install vqf).
+  PY="python -I"; D=experiments/reviewer_checks/F9_openloop_dose
+  $PY $D/01_build.py       -> ops.pkl (per sequence x attitude source: closed-form operators of ATE; per run: error moments)
+  $PY $D/02_repro.py       -> repro_check.json (operator ATE/IABE/bias RMSE vs the stored values; nine-case agreement vs H0)
+  $PY $D/02b_selftest.py   -> selftest_offsets.json (closed form vs brute-force trajectories at nonzero offsets)
+  $PY $D/03_dose.py        -> dose_counts.csv, dose_chunks.npz
+  $PY $D/04_analyze.py     -> dose_summary.csv, dose_curves_pooled.csv, leakage_by_source.csv, crossing_vs_leakage.csv, real_pair_scale.json,
+                              fig_openloop_dose.png, fig_openloop_dose_allsources.png
+Scripts resolve their paths from their own location, so the working directory does not matter.
+
+Stored in this folder: the scripts and the final result files listed above (dose_summary.csv, dose_curves_pooled.csv and leakage_by_source.csv are what
+paper_scripts/make_figs.py reads for Fig. S3 and Table S23). NOT stored: the intermediate files ops.pkl and dose_chunks.npz (steps 02-04 need them,
+step 01 recreates ops.pkl from raw data) and the two PNG figures.
+Inputs (read only): euroc_full/results/{metrics_wide.csv,runs_index.csv} (included), euroc_full/results/runs/*/series.npz and the EuRoC machine_hall raw data
+ (steps 01 and 02b only; not included), experiments/attitude_controls/{ate_per_run_gated.csv, vqf/v2/ate_per_run_v2.csv (source v_vqf_clip10(cold))},
+ experiments/reviewer_checks/{F2_aligned_ate/f2_lib.py, F5_scaled_attitude/f5_lib.py + ate_scaled_per_run.csv, H0_unified_stats/lib.py}.
+
+VQF source: biasClip 10 deg/s, cold start, as in Table III and supplement S8 (attitude_controls/vqf/v2). With the default clip of 2 deg/s, use
+biasClip=2.0 in f9_lib.vqf_att and the source id f_vqf_6D(default); those results are not stored here.

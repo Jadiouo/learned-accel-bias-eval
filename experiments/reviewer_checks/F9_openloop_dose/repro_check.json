@@ -1,0 +1,67 @@
+{
+ "ate_n_compared": 8910,
+ "ate_max_rel_err": 7.803057612821514e-13,
+ "ate_max_rel_err_by_source": {
+  "a_raw_gyro(paper)": 2.3034692845717137e-15,
+  "b_gyro-GT-bias(oracle)": 5.580026588481093e-13,
+  "c_static-mean-bias": 2.5374781947449138e-14,
+  "d_mahony(kp=1,ki=0.05)": 3.867494527019369e-15,
+  "e_mahony_gated(kp=1,ki=0.05)": 2.673397138952423e-15,
+  "s_gyro-bias-comp-50%": 2.9200966117603262e-15,
+  "s_gyro-bias-comp-90%": 8.14889094797574e-15,
+  "s_gyro-bias-comp-99%": 2.0292938502538466e-13,
+  "v_vqf_clip10(cold)": 7.803057612821514e-13
+ },
+ "iabe_max_rel_err": 2.2693177227187156e-12,
+ "bias_rmse_max_rel_err": 3.7129592229708045e-16,
+ "f5_scaled_max_rel_err": {
+  "W|s=0.3": 1.6955957747312624e-13,
+  "W|s=0.1": 4.0450420171353583e-13,
+  "W|s=0.03": 7.176138835351533e-13
+ },
+ "agreement_9case": {
+  "raw ATE (stored csv)": {
+   "point": 0.5586202770215694,
+   "lo": 0.4599833224609525,
+   "hi": 0.6572572315821862,
+   "clusters": 5
+  },
+  "oracle ATE (stored csv)": {
+   "point": 0.5597869985341192,
+   "lo": 0.4227100462502391,
+   "hi": 0.6968639508179992,
+   "clusters": 5
+  },
+  "raw ATE (operators)": {
+   "point": 0.5586202770215694,
+   "lo": 0.4599833224609525,
+   "hi": 0.6572572315821862,
+   "clusters": 5
+  },
+  "oracle ATE (operators)": {
+   "point": 0.5597869985341192,
+   "lo": 0.4227100462502391,
+   "hi": 0.6968639508179992,
+   "clusters": 5
+  },
+  "IABE (operators)": {
+   "point": 0.8023753253358064,
+   "lo": 0.7040707572774134,
+   "hi": 0.9006798933941993,
+   "clusters": 5
+  },
+  "VQF clip10 cold ATE (operators)": {
+   "point": 0.5686421156550094,
+   "lo": 0.4646973794767059,
+   "hi": 0.6725868518333129,
+   "clusters": 5
+  }
+ },
+ "agreement_expected": {
+  "VQF clip10 cold": "0.5686 [0.4647, 0.6726] (H0 canonical_agreement.csv, nine cases pooled)",
+  "raw": "0.5586 [0.4600, 0.6573]",
+  "oracle": "0.5598 [0.4227, 0.6969]",
+  "IABE": "0.8024"
+ },
+ "oracle_theta_bar_median_deg_over_5seq": 0.12454713142132272
+}

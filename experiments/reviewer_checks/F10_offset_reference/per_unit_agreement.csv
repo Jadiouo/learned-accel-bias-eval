@@ -1,0 +1,55 @@
+selector,mamba,measure,attitude_source,unit,agree,n_pairs
+offset,included,offset own retest (upper bound),not applicable,A/MH_01,0.988856112749918,12.107142857142858
+offset,included,offset own retest (upper bound),not applicable,A/MH_02,0.9748633879781421,14.523809523809524
+offset,included,offset own retest (upper bound),not applicable,A/MH_03,0.9333333333333333,0.05952380952380952
+offset,included,offset own retest (upper bound),not applicable,A/MH_04,0.983013698630137,14.484126984126984
+offset,included,offset own retest (upper bound),not applicable,A/MH_05,0.9771309771309772,3.8174603174603177
+offset,included,offset own retest (upper bound),not applicable,B/MH_01,0.9734111543450065,6.119047619047619
+offset,included,offset own retest (upper bound),not applicable,B/MH_02,0.9789644012944984,7.357142857142857
+offset,included,offset own retest (upper bound),not applicable,B/MH_03,0.7777777777777778,0.03571428571428571
+offset,included,offset own retest (upper bound),not applicable,B/MH_05,0.9719735305566368,10.194444444444445
+offset,included,ATE,raw,A/MH_01,0.09996722386102917,12.107142857142858
+offset,included,ATE,raw,A/MH_02,0.29808743169398905,14.523809523809524
+offset,included,ATE,raw,A/MH_03,0.5333333333333333,0.05952380952380952
+offset,included,ATE,raw,A/MH_04,0.6484931506849315,14.484126984126984
+offset,included,ATE,raw,A/MH_05,0.553014553014553,3.8174603174603177
+offset,included,ATE,raw,B/MH_01,0.953307392996109,6.119047619047619
+offset,included,ATE,raw,B/MH_02,0.9762675296655879,7.357142857142857
+offset,included,ATE,raw,B/MH_03,1.0,0.03571428571428571
+offset,included,ATE,raw,B/MH_05,0.05799922148695991,10.194444444444445
+offset,excluded,offset own retest (upper bound),not applicable,A/MH_01,0.9857333927775301,8.90079365079365
+offset,excluded,offset own retest (upper bound),not applicable,A/MH_02,0.9715274081958488,14.912698412698413
+offset,excluded,offset own retest (upper bound),not applicable,A/MH_03,0.8888888888888888,0.03571428571428571
+offset,excluded,offset own retest (upper bound),not applicable,A/MH_04,0.9879288437102922,6.246031746031746
+offset,excluded,offset own retest (upper bound),not applicable,A/MH_05,0.9707955689828801,3.9404761904761907
+offset,excluded,offset own retest (upper bound),not applicable,B/MH_01,0.974025974025974,6.722222222222222
+offset,excluded,offset own retest (upper bound),not applicable,B/MH_02,0.9807599807599807,8.25
+offset,excluded,offset own retest (upper bound),not applicable,B/MH_03,0.8181818181818182,0.0873015873015873
+offset,excluded,offset own retest (upper bound),not applicable,B/MH_05,0.9815016322089227,10.94047619047619
+offset,excluded,ATE,raw,A/MH_01,0.11056620597414177,8.90079365079365
+offset,excluded,ATE,raw,A/MH_02,0.28924960085151674,14.912698412698413
+offset,excluded,ATE,raw,A/MH_03,0.6666666666666666,0.03571428571428571
+offset,excluded,ATE,raw,A/MH_04,0.3811944091486658,6.246031746031746
+offset,excluded,ATE,raw,A/MH_05,0.5125881168177241,3.9404761904761907
+offset,excluded,ATE,raw,B/MH_01,0.9515938606847698,6.722222222222222
+offset,excluded,ATE,raw,B/MH_02,0.9754689754689755,8.25
+offset,excluded,ATE,raw,B/MH_03,0.9090909090909091,0.0873015873015873
+offset,excluded,ATE,raw,B/MH_05,0.04352557127312296,10.94047619047619
+bias RMSE,included,offset own retest (upper bound),not applicable,A/MH_01,0.8631802979629066,13.051587301587302
+bias RMSE,included,offset own retest (upper bound),not applicable,A/MH_02,0.872845704980323,29.24206349206349
+bias RMSE,included,offset own retest (upper bound),not applicable,A/MH_03,0.9452022577610536,16.873015873015873
+bias RMSE,included,offset own retest (upper bound),not applicable,A/MH_04,0.964612094108497,20.408730158730158
+bias RMSE,included,offset own retest (upper bound),not applicable,A/MH_05,0.884454457676215,24.658730158730158
+bias RMSE,included,offset own retest (upper bound),not applicable,B/MH_01,0.974025974025974,0.6111111111111112
+bias RMSE,included,offset own retest (upper bound),not applicable,B/MH_02,0.9341442953020134,9.46031746031746
+bias RMSE,included,offset own retest (upper bound),not applicable,B/MH_03,0.6652227722772277,6.412698412698413
+bias RMSE,included,offset own retest (upper bound),not applicable,B/MH_05,0.843313373253493,11.928571428571429
+bias RMSE,excluded,offset own retest (upper bound),not applicable,A/MH_01,0.9760397830018083,8.777777777777779
+bias RMSE,excluded,offset own retest (upper bound),not applicable,A/MH_02,0.9650276097817513,15.091269841269842
+bias RMSE,excluded,offset own retest (upper bound),not applicable,A/MH_03,0.8840125391849529,3.7976190476190474
+bias RMSE,excluded,offset own retest (upper bound),not applicable,A/MH_04,0.968521641371557,7.059523809523809
+bias RMSE,excluded,offset own retest (upper bound),not applicable,A/MH_05,0.9804338579327946,9.329365079365079
+bias RMSE,excluded,offset own retest (upper bound),not applicable,B/MH_01,0.9736842105263158,0.753968253968254
+bias RMSE,excluded,offset own retest (upper bound),not applicable,B/MH_02,0.9810126582278481,8.15079365079365
+bias RMSE,excluded,offset own retest (upper bound),not applicable,B/MH_03,0.8178571428571428,1.1111111111111112
+bias RMSE,excluded,offset own retest (upper bound),not applicable,B/MH_05,0.9131642931573463,11.424603174603174

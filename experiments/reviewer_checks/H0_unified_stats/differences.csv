@@ -1,0 +1,139 @@
+dataset,mamba,group,minuend,subtrahend,diff,lo,hi
+Machine Hall,included,regime A,ATE without shared leakage term | raw,ATE | raw,0.2702630677275669,0.13658149183330362,0.40394464362183025
+Machine Hall,included,regime B,ATE without shared leakage term | raw,ATE | raw,0.1293296089385474,-0.8692528841744144,1.1279121020515093
+Machine Hall,included,nine cases pooled,ATE without shared leakage term | raw,ATE | raw,0.24007538815927243,0.053903825138938405,0.4262469511796064
+Machine Hall,included,regime A,ATE without rotation term Q | raw,ATE | raw,0.023527620207865363,-0.02145762809664207,0.06851286851237279
+Machine Hall,included,regime B,ATE without rotation term Q | raw,ATE | raw,-0.006424581005586627,-0.023565491025784775,0.01071632901461152
+Machine Hall,included,nine cases pooled,ATE without rotation term Q | raw,ATE | raw,0.017111915517396104,-0.014788959313237128,0.049012790348029335
+Machine Hall,included,regime A,ATE with leakage sign reversed | raw,ATE | raw,-0.09315871625994598,-0.38084908324975575,0.19453165072986378
+Machine Hall,included,regime B,ATE with leakage sign reversed | raw,ATE | raw,-0.2051675977653632,-1.9130151086805656,1.502679913149839
+Machine Hall,included,nine cases pooled,ATE with leakage sign reversed | raw,ATE | raw,-0.1171508062344811,-0.314618169816235,0.08031655734727283
+Machine Hall,included,regime A,IABE | reference attitude,ATE | raw,0.2738797730993261,0.14335152120120997,0.4044080249974422
+Machine Hall,included,regime B,IABE | reference attitude,ATE | raw,0.13324022346368714,-0.8552285129412237,1.1217089598685979
+Machine Hall,included,nine cases pooled,IABE | reference attitude,ATE | raw,0.243755048314237,0.06922704150895403,0.41828305511951996
+Machine Hall,included,regime A,ATE aligned 4DoF | raw,ATE | raw,-0.008413598812197831,-0.019146798049018286,0.0023196004246226233
+Machine Hall,included,regime B,ATE aligned 4DoF | raw,ATE | raw,-0.004469273743016755,-0.017964451493307197,0.009025904007273686
+Machine Hall,included,nine cases pooled,ATE aligned 4DoF | raw,ATE | raw,-0.007568731863463629,-0.017498761216425192,0.0023612974894979353
+Machine Hall,included,regime A,ATE aligned SE(3) | raw,ATE | raw,-0.009784139795180335,-0.020727914792568376,0.0011596352022077046
+Machine Hall,included,regime B,ATE aligned SE(3) | raw,ATE | raw,-0.0041899441340782495,-0.016799187224799825,0.008419298956643326
+Machine Hall,included,nine cases pooled,ATE aligned SE(3) | raw,ATE | raw,-0.008585873694917256,-0.018490659282010692,0.0013189118921761792
+Vicon rooms,included,six sequences (regime A),ATE without shared leakage term | raw,ATE | raw,0.10555203715431705,-0.041892402962731945,0.25299647727136604
+Vicon rooms,included,six sequences (regime A),ATE without rotation term Q | raw,ATE | raw,-0.014777285201604373,-0.06532480369625379,0.03577023329304505
+Vicon rooms,included,six sequences (regime A),ATE with leakage sign reversed | raw,ATE | raw,-0.21356695517556823,-0.5985817579047803,0.17144784755364378
+Vicon rooms,included,six sequences (regime A),IABE | reference attitude,ATE | raw,0.09337836886918582,-0.06429462594820784,0.2510513636865795
+Machine Hall,included,regime A,ATE without shared leakage term | oracle,ATE | oracle,0.24692580043400458,0.0685958107349329,0.42525579013307624
+Machine Hall,included,regime B,ATE without shared leakage term | oracle,ATE | oracle,0.22695530726256985,-0.5338075304570365,0.9877181449821762
+Machine Hall,included,nine cases pooled,ATE without shared leakage term | oracle,ATE | oracle,0.2426481586741257,0.05068174924150809,0.4346145681067433
+Machine Hall,included,regime A,ATE without rotation term Q | oracle,ATE | oracle,0.00022842349716367671,0.00015368796134028673,0.0003031590329870667
+Machine Hall,included,regime B,ATE without rotation term Q | oracle,ATE | oracle,0.00013966480446925278,-0.0029619852828881217,0.0032413148918266272
+Machine Hall,included,nine cases pooled,ATE without rotation term Q | oracle,ATE | oracle,0.0002094115535344887,-0.00037019454668478567,0.0007890176537537631
+Machine Hall,included,regime A,ATE with leakage sign reversed | oracle,ATE | oracle,-0.07065900178931739,-0.40138350112718385,0.2600654975485491
+Machine Hall,included,regime B,ATE with leakage sign reversed | oracle,ATE | oracle,0.19636871508379894,-0.6236441268226963,1.0163815569902943
+Machine Hall,included,nine cases pooled,ATE with leakage sign reversed | oracle,ATE | oracle,-0.013462171298650794,-0.2624385664242674,0.2355142238269658
+Machine Hall,included,regime A,IABE | reference attitude,ATE | oracle,0.24692580043400458,0.06863939090102664,0.4252122099669825
+Machine Hall,included,regime B,IABE | reference attitude,ATE | oracle,0.22667597765363134,-0.5333502728809312,0.9867022281881939
+Machine Hall,included,nine cases pooled,IABE | reference attitude,ATE | oracle,0.24258832680168718,0.05074722827994038,0.434429425323434
+Machine Hall,included,regime A,ATE aligned 4DoF | oracle,ATE | oracle,0.005406022766208496,-0.1305953712152617,0.1414074167476787
+Machine Hall,included,regime B,ATE aligned 4DoF | oracle,ATE | oracle,0.06368715083798882,-0.22197199703482834,0.34934629871080597
+Machine Hall,included,nine cases pooled,ATE aligned 4DoF | oracle,ATE | oracle,0.01788972985909587,-0.12899820177042925,0.164777661488621
+Machine Hall,included,regime A,ATE aligned SE(3) | oracle,ATE | oracle,-0.004873034606159843,-0.17605649026882075,0.16631042105650107
+Machine Hall,included,regime B,ATE aligned SE(3) | oracle,ATE | oracle,0.06256983240223468,-0.21011604349271046,0.3352557082971798
+Machine Hall,included,nine cases pooled,ATE aligned SE(3) | oracle,ATE | oracle,0.009573099590151624,-0.15254115065439877,0.17168734983470202
+Vicon rooms,included,six sequences (regime A),ATE without shared leakage term | oracle,ATE | oracle,0.16093167264794872,-0.01720264723985926,0.3390659925357567
+Vicon rooms,included,six sequences (regime A),ATE without rotation term Q | oracle,ATE | oracle,0.0005629441981562788,-0.00021928959134624737,0.001345177987658805
+Vicon rooms,included,six sequences (regime A),ATE with leakage sign reversed | oracle,ATE | oracle,-0.06220533389627758,-0.5964338754484053,0.47202320765585015
+Vicon rooms,included,six sequences (regime A),IABE | reference attitude,ATE | oracle,0.16177608894518325,-0.015825842739709467,0.33937802063007594
+Machine Hall,included,regime A,ATE | oracle,ATE | raw,0.026953972665321513,-0.24726151505672384,0.30116946038736686
+Machine Hall,included,regime B,ATE | oracle,ATE | raw,-0.09343575418994421,-0.40715810422687027,0.22028659584698185
+Machine Hall,included,nine cases pooled,ATE | oracle,ATE | raw,0.0011667215125498176,-0.19062832641087435,0.19296176943597398
+Vicon rooms,included,six sequences (regime A),ATE | oracle,ATE | raw,-0.06839772007599743,-0.18099947838621494,0.0442040382342201
+Machine Hall,included,regime A,"ATE | VQF warm, clip 10",ATE | Mahony warm,-0.0630829558000533,-0.25933355519495277,0.13316764359484617
+Machine Hall,included,regime B,"ATE | VQF warm, clip 10",ATE | Mahony warm,-0.3347765363128492,-1.2885369891298528,0.6189839165041543
+Machine Hall,included,nine cases pooled,"ATE | VQF warm, clip 10",ATE | Mahony warm,-0.12127920543273407,-0.4337954015403458,0.19123699067487765
+Machine Hall,included,regime A,"ATE | VQF warm, clip 10",ATE | gated Mahony warm,-0.0698595195492443,-0.2484048886263841,0.1086858495278955
+Machine Hall,included,regime B,"ATE | VQF warm, clip 10",ATE | gated Mahony warm,-0.30963687150837993,-1.1645685241113855,0.5452947810946256
+Machine Hall,included,nine cases pooled,"ATE | VQF warm, clip 10",ATE | gated Mahony warm,-0.12121937356029555,-0.39316048766471956,0.15072174054412846
+Machine Hall,included,regime A,"ATE | VQF cold, clip 10",ATE | Mahony,0.00019035291430313794,-0.016627162642722057,0.017007868471328333
+Machine Hall,included,regime B,"ATE | VQF cold, clip 10",ATE | Mahony,0.0011173184357541333,-0.0050980892957614935,0.00733272616726976
+Machine Hall,included,nine cases pooled,"ATE | VQF cold, clip 10",ATE | Mahony,0.0003889071708499392,-0.013572778510923318,0.014350592852623197
+Machine Hall,included,regime A,"ATE | VQF cold, clip 10",ATE | gated Mahony,0.010583622035253315,-0.020345873780724888,0.04151311785123152
+Machine Hall,included,regime B,"ATE | VQF cold, clip 10",ATE | gated Mahony,0.0011173184357541333,-0.00011773202653078858,0.002352368898039055
+Machine Hall,included,nine cases pooled,"ATE | VQF cold, clip 10",ATE | gated Mahony,0.008555957758698107,-0.015396677628230486,0.0325085931456267
+Machine Hall,included,regime A,ATE | Mahony warm,ATE | Mahony,-0.07465641298968284,-0.4562738102467045,0.3069609842673388
+Machine Hall,included,regime B,ATE | Mahony warm,ATE | Mahony,0.20055865921787708,-0.5567813654784617,0.9578986839142158
+Machine Hall,included,nine cases pooled,ATE | Mahony warm,ATE | Mahony,-0.015705866515092537,-0.2863493615794424,0.25493762854925733
+Machine Hall,included,regime A,ATE | gated Mahony warm,ATE | gated Mahony,-0.057486580119541664,-0.39717579513433,0.28220263489524666
+Machine Hall,included,regime B,ATE | gated Mahony warm,ATE | gated Mahony,0.1754189944134078,-0.6456792778934023,0.9965172667202179
+Machine Hall,included,nine cases pooled,ATE | gated Mahony warm,ATE | gated Mahony,-0.007598647799682889,-0.22344786934144265,0.20825057374207687
+Machine Hall,included,regime A,"ATE | VQF warm, clip 10","ATE | VQF cold, clip 10",-0.13792972170403928,-0.3917781806007797,0.11591873719270113
+Machine Hall,included,regime B,"ATE | VQF warm, clip 10","ATE | VQF cold, clip 10",-0.13533519553072626,-1.7786602745147428,1.5079898834532903
+Machine Hall,included,nine cases pooled,"ATE | VQF warm, clip 10","ATE | VQF cold, clip 10",-0.13737397911867655,-0.39777077246722975,0.12302281422987665
+Machine Hall,excluded,regime A,ATE without shared leakage term | raw,ATE | raw,0.5416141235813368,0.40044998723575453,0.682778259926919
+Machine Hall,excluded,regime B,ATE without shared leakage term | raw,ATE | raw,0.34888025171201187,-0.851530682148005,1.5492911855720286
+Machine Hall,excluded,nine cases pooled,ATE without shared leakage term | raw,ATE | raw,0.4785216601029991,0.2821693642556306,0.6748739559503676
+Machine Hall,excluded,regime A,ATE without rotation term Q | raw,ATE | raw,0.033777697712123966,-0.05358616962689837,0.1211415650511463
+Machine Hall,excluded,regime B,ATE without rotation term Q | raw,ATE | raw,-0.0064778826577827076,-0.033627924048930426,0.02067215873336501
+Machine Hall,excluded,nine cases pooled,ATE without rotation term Q | raw,ATE | raw,0.020599818236897938,-0.03482797444382486,0.07602761091762074
+Machine Hall,excluded,regime A,ATE with leakage sign reversed | raw,ATE | raw,0.15528733561520452,-0.12658798498619,0.43716265621659905
+Machine Hall,excluded,regime B,ATE with leakage sign reversed | raw,ATE | raw,-0.07699426244678881,-2.7515420800098527,2.597553555116275
+Machine Hall,excluded,nine cases pooled,ATE with leakage sign reversed | raw,ATE | raw,0.07924871251136023,-0.3689225330040813,0.5274199580268017
+Machine Hall,excluded,regime A,IABE | reference attitude,ATE | raw,0.5435957485137812,0.39918345208326456,0.6880080449442979
+Machine Hall,excluded,regime B,IABE | reference attitude,ATE | raw,0.3501758282435684,-0.8462802944394948,1.5466319509266317
+Machine Hall,excluded,nine cases pooled,IABE | reference attitude,ATE | raw,0.4802787034232051,0.2869082698623696,0.6736491369840406
+Machine Hall,excluded,regime A,ATE aligned 4DoF | raw,ATE | raw,-0.007746352008647095,-0.020346577835396014,0.004853873818101822
+Machine Hall,excluded,regime B,ATE aligned 4DoF | raw,ATE | raw,-0.00370164723301869,-0.01787261704727449,0.010469322581237112
+Machine Hall,excluded,nine cases pooled,ATE aligned 4DoF | raw,ATE | raw,-0.006422296273856376,-0.015707919662923037,0.0028633271152102863
+Machine Hall,excluded,regime A,ATE aligned SE(3) | raw,ATE | raw,-0.008466942893172402,-0.01981978923904084,0.0028859034526960356
+Machine Hall,excluded,regime B,ATE aligned SE(3) | raw,ATE | raw,-0.003331482509716821,-0.015269710246176594,0.008606745226742952
+Machine Hall,excluded,nine cases pooled,ATE aligned SE(3) | raw,ATE | raw,-0.00678582247803694,-0.014800477024757844,0.001228832068683964
+Vicon rooms,excluded,six sequences (regime A),ATE without shared leakage term | raw,ATE | raw,0.20397913849719918,-0.44565226095242616,0.8536105379468245
+Vicon rooms,excluded,six sequences (regime A),ATE without rotation term Q | raw,ATE | raw,-0.018543558045199915,-0.1540128173538798,0.11692570126347998
+Vicon rooms,excluded,six sequences (regime A),ATE with leakage sign reversed | raw,ATE | raw,-0.3028781147382654,-1.242439429117013,0.6366831996404821
+Vicon rooms,excluded,six sequences (regime A),IABE | reference attitude,ATE | raw,0.20938767626038246,-0.4215556616103465,0.8403310141311114
+Machine Hall,excluded,regime A,ATE without shared leakage term | oracle,ATE | oracle,0.2842731039452351,0.19015397189872768,0.3783922359917425
+Machine Hall,excluded,regime B,ATE without shared leakage term | oracle,ATE | oracle,0.46714788080695907,-0.1829013543278713,1.1171971159417895
+Machine Hall,excluded,nine cases pooled,ATE without shared leakage term | oracle,ATE | oracle,0.3441381399575887,0.10517122492041511,0.5831050549947623
+Machine Hall,excluded,regime A,ATE without rotation term Q | oracle,ATE | oracle,0.0003602954422626814,6.604316438128447e-05,0.0006545477201440784
+Machine Hall,excluded,regime B,ATE without rotation term Q | oracle,ATE | oracle,0.000370164723301869,-0.0052525981075898275,0.0059929275541935655
+Machine Hall,excluded,nine cases pooled,ATE without rotation term Q | oracle,ATE | oracle,0.00036352620418056425,-0.0010660764182030664,0.0017931288265641949
+Machine Hall,excluded,regime A,ATE with leakage sign reversed | oracle,ATE | oracle,-0.25626013330931363,-0.44140248273391414,-0.07111778388471315
+Machine Hall,excluded,regime B,ATE with leakage sign reversed | oracle,ATE | oracle,0.45049046825837497,-0.16971012893401555,1.0706910654507655
+Machine Hall,excluded,nine cases pooled,ATE with leakage sign reversed | oracle,ATE | oracle,-0.024901544986367763,-0.430345272203784,0.38054218223104846
+Machine Hall,excluded,regime A,IABE | reference attitude,ATE | oracle,0.2841830300846694,0.19011263731823963,0.37825342285109914
+Machine Hall,excluded,regime B,IABE | reference attitude,ATE | oracle,0.46696279844530814,-0.18250294712799392,1.1164285440186101
+Machine Hall,excluded,nine cases pooled,IABE | reference attitude,ATE | oracle,0.3440169645561951,0.10520707357719095,0.5828268555351993
+Machine Hall,excluded,regime A,ATE aligned 4DoF | oracle,ATE | oracle,0.038461538461538436,-0.09172963942889395,0.16865271635197082
+Machine Hall,excluded,regime B,ATE aligned 4DoF | oracle,ATE | oracle,0.07033129742735517,-0.3365465416505671,0.4772091365052774
+Machine Hall,excluded,nine cases pooled,ATE aligned 4DoF | oracle,ATE | oracle,0.048894274462284226,-0.12821642362338395,0.2260049725479524
+Machine Hall,excluded,regime A,ATE aligned SE(3) | oracle,ATE | oracle,0.015312556296162794,-0.10553851526884274,0.1361636278611683
+Machine Hall,excluded,regime B,ATE aligned SE(3) | oracle,ATE | oracle,0.06329816768461966,-0.43472366247296385,0.5613199978422032
+Machine Hall,excluded,nine cases pooled,ATE aligned SE(3) | oracle,ATE | oracle,0.03102090275674041,-0.1446444082358828,0.2066862137493636
+Vicon rooms,excluded,six sequences (regime A),ATE without shared leakage term | oracle,ATE | oracle,0.27023372609619467,-0.49273617320399454,1.0332036253963839
+Vicon rooms,excluded,six sequences (regime A),ATE without rotation term Q | oracle,ATE | oracle,0.0,-0.0009555004719018537,0.0009555004719018537
+Vicon rooms,excluded,six sequences (regime A),ATE with leakage sign reversed | oracle,ATE | oracle,-0.15877921576202436,-1.3491161388128439,1.031557707288795
+Vicon rooms,excluded,six sequences (regime A),IABE | reference attitude,ATE | oracle,0.2731311570407572,-0.48372771571306605,1.0299900297945803
+Machine Hall,excluded,regime A,ATE | oracle,ATE | raw,0.2594127184291119,0.05415751864989615,0.46466791820832765
+Machine Hall,excluded,regime B,ATE | oracle,ATE | raw,-0.11678697020173973,-0.6806564589578468,0.44708251855436737
+Machine Hall,excluded,nine cases pooled,ATE | oracle,ATE | raw,0.13626173886700998,0.04587709675103825,0.22664638098298173
+Vicon rooms,excluded,six sequences (regime A),ATE | oracle,ATE | raw,-0.06374348078037473,-0.2019444132963386,0.07445745173558915
+Machine Hall,excluded,regime A,"ATE | VQF warm, clip 10",ATE | Mahony warm,-0.07115834984687441,-0.33619665488950473,0.1938799551957559
+Machine Hall,excluded,regime B,"ATE | VQF warm, clip 10",ATE | Mahony warm,-0.357023875624653,-1.904347811251995,1.1903000600026887
+Machine Hall,excluded,nine cases pooled,"ATE | VQF warm, clip 10",ATE | Mahony warm,-0.16473795819448656,-0.6872566084971466,0.35778069210817354
+Machine Hall,excluded,regime A,"ATE | VQF warm, clip 10",ATE | gated Mahony warm,-0.0798955143217438,-0.3588495358913828,0.1990585072478952
+Machine Hall,excluded,regime B,"ATE | VQF warm, clip 10",ATE | gated Mahony warm,-0.28447158985748655,-1.5864932631532698,1.0175500834382967
+Machine Hall,excluded,nine cases pooled,"ATE | VQF warm, clip 10",ATE | gated Mahony warm,-0.14686458648894274,-0.6281100243222266,0.3343808513443411
+Machine Hall,excluded,regime A,"ATE | VQF cold, clip 10",ATE | Mahony,-0.011979823455233296,-0.023509768291762965,-0.0004498786187036273
+Machine Hall,excluded,regime B,"ATE | VQF cold, clip 10",ATE | Mahony,0.0001850823616509345,-0.008800874057176764,0.009171038780478633
+Machine Hall,excluded,nine cases pooled,"ATE | VQF cold, clip 10",ATE | Mahony,-0.007997576491972136,-0.016147292263360726,0.0001521392794164543
+Machine Hall,excluded,regime A,"ATE | VQF cold, clip 10",ATE | gated Mahony,0.015042334714465866,-0.03752706100632141,0.06761173043525315
+Machine Hall,excluded,regime B,"ATE | VQF cold, clip 10",ATE | gated Mahony,0.0020359059781602795,-0.01157309847059413,0.01564491042691469
+Machine Hall,excluded,nine cases pooled,"ATE | VQF cold, clip 10",ATE | gated Mahony,0.010784610724023036,-0.027939410655681764,0.049508632103727836
+Machine Hall,excluded,regime A,ATE | Mahony warm,ATE | Mahony,0.18176905062150966,-0.17052874515696642,0.5340668463999858
+Machine Hall,excluded,regime B,ATE | Mahony warm,ATE | Mahony,0.31871182676290954,-0.8424418483399944,1.4798655018658136
+Machine Hall,excluded,nine cases pooled,ATE | Mahony warm,ATE | Mahony,0.22659800060587704,0.08770254998813395,0.3654934512236201
+Machine Hall,excluded,regime A,ATE | gated Mahony warm,ATE | gated Mahony,0.2175283732660782,-0.10133989491273865,0.5363966414448951
+Machine Hall,excluded,regime B,ATE | gated Mahony warm,ATE | gated Mahony,0.24801036461225245,-1.1724067363460193,1.6684274655705242
+Machine Hall,excluded,nine cases pooled,ATE | gated Mahony warm,ATE | gated Mahony,0.2275068161163284,0.07811441536139388,0.37689921687126293
+Machine Hall,excluded,regime A,"ATE | VQF warm, clip 10","ATE | VQF cold, clip 10",0.12259052422986855,-0.10733754560289957,0.35251859406263664
+Machine Hall,excluded,regime B,"ATE | VQF warm, clip 10","ATE | VQF cold, clip 10",-0.038497131223394376,-2.7325273518233515,2.6555330893765627
+Machine Hall,excluded,nine cases pooled,"ATE | VQF warm, clip 10","ATE | VQF cold, clip 10",0.06985761890336262,-0.4845524045169747,0.6242676423236999

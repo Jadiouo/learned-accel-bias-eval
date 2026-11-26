@@ -1,0 +1,19 @@
+F4_seqcluster -- Supplement S6 (sequence-cluster bootstrap intervals for the agreement rates).
+
+Purpose: recomputes the pooled agreement rates and their confidence intervals with the sequence (not the run) as the resampling unit,
+and a version without Mamba.
+
+All commands are run from the repository root. PY is any Python 3.9+ environment with requirements.txt installed
+(scipy, pandas, numpy, pyyaml; matplotlib only for F3 05_extras.py). All scripts are CPU only; prefix with CUDA_VISIBLE_DEVICES="" if desired.
+  PY="python -I"
+Scripts resolve their paths from their own location, so the working directory does not matter.
+Raw inputs not in this repository: EuRoC raw data (see top-level README, "Getting EuRoC"; or set EUROC_DATA_DIR) and the per-run
+euroc_full/results*/runs/*/series.npz files (obtained by re-training, see top-level README).
+
+Inputs (all in this repository): euroc_full/results/metrics_wide.csv, euroc_full/results/runs_index.csv,
+  experiments/attitude_controls/ate_per_run_gated.csv; pipeline imported from ../F1_noise_ceiling/common.py.
+Commands (CPU, read-only on the csv files):
+  $PY experiments/reviewer_checks/F4_seqcluster/f4.py      -> f4_results.csv   (numpy rng seed 1)
+  $PY experiments/reviewer_checks/F4_seqcluster/f4_ci.py   -> f4_ci.csv        (numpy rng seed 2)
+A check excluding the Kalman-filter and particle-filter baselines from experiments/closed_loop/consequences_long.csv
+(cfg = base, mode = O, L = 10; units = sequence x repetition) was run as an inline snippet and is not included as a script.

@@ -1,0 +1,24 @@
+{
+ "n_s1_vs_oracle_csv": 990,
+ "max_rel_s1_vs_oracle_csv": 1.2373972969978481e-12,
+ "n_s0_vs_iabe": 990,
+ "max_rel_s0_vs_iabe_rot": 2.22313530623916e-12,
+ "max_rel_B_s1_vs_oracle_csv": 1.245842894247241e-12,
+ "max_rel_B_s0_vs_iabe_rot": 2.22313530623916e-12,
+ "max_rel_T_s1_vs_oracle_csv": 1.2373972969978481e-12,
+ "max_rel_T_s0_vs_iabe_rot": 1.9985563914398272,
+ "agree_ALL_W_s1": 0.5597869985341192,
+ "agree_ALL_oracle_csv": 0.5597869985341192,
+ "agree_ALL_W_s0": 0.8023753253358064,
+ "agree_ALL_iabe_vs_bias": 0.8023753253358064,
+ "agree_A_W_s0": 0.8205352723950203,
+ "agree_A_iabe_vs_bias": 0.8205352723950203,
+ "agree_B_W_s0": 0.7357541899441341,
+ "agree_B_iabe_vs_bias": 0.7357541899441341,
+ "agree_ALL_raw_csv": 0.5586202770215694,
+ "spearman_agree_vs_neg_log_ratio_RM_30_to_0.1": {
+  "ALL": 0.942857142857143,
+  "A": 1.0,
+  "B": 0.7714285714285715
+ }
+}

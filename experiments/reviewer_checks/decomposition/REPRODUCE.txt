@@ -1,0 +1,22 @@
+decomposition -- Supplement S16.1 (decomposition of the open-loop position error into a tilt-leakage term L, a tilt x bias-error cross term Q and a bias-integration term I).
+
+Purpose: decomposes each run's ATE into the three terms of Proposition 1 (ATE = ||L + Q + I||), rebuilds ATE with individual terms
+removed or sign-flipped, and tests which term drives the drop in agreement with the bias-RMSE ranking; jk.py adds a leave-one-sequence-out
+(jackknife) interval; f15_checks.py compares the observed agreement with the noise-ceiling simulation (F1) and the rescaling results (F5).
+
+All commands are run from the repository root. PY is any Python 3.9+ environment with requirements.txt installed
+(scipy, pandas, numpy, pyyaml; matplotlib only for F3 05_extras.py). All scripts are CPU only; prefix with CUDA_VISIBLE_DEVICES="" if desired.
+  PY="python -I"
+Scripts resolve their paths from their own location, so the working directory does not matter.
+Raw inputs not in this repository: EuRoC raw data (see top-level README, "Getting EuRoC"; or set EUROC_DATA_DIR) and the per-run
+euroc_full/results*/runs/*/series.npz files (obtained by re-training, see top-level README).
+
+Inputs: euroc_full/results/{metrics_wide.csv, runs_index.csv, runs/*/series.npz}, EuRoC Machine Hall raw data,
+  experiments/attitude_controls/ate_per_run_gated.csv, ../F1_noise_ceiling/common.py, ../F2_aligned_ate/f2_lib.py.
+Commands (the output directory is an argument of f5_decomp.py; use this folder):
+  $PY experiments/reviewer_checks/decomposition/f5_decomp.py experiments/reviewer_checks/decomposition
+        -> f5_decomp_runs.csv (per-run terms and variants), f5_decomp_agree.csv (agreement rates)    (needs series.npz and EuRoC raw data)
+  $PY experiments/reviewer_checks/decomposition/jk.py             (prints leave-one-sequence-out intervals; reads f5_decomp_runs.csv)
+  $PY experiments/reviewer_checks/decomposition/f15_checks.py     (prints the F1/F5 consistency checks; needs the sim_agree_raw_*_N2000.npy files written by
+        ../F1_noise_ceiling/simulate.py 2000, which are not stored here, and ../F5_scaled_attitude/ate_scaled_per_run.csv)
+Seeds: 30 random rotations from scipy Rotation.random(random_state=11); rng(7) in f5_decomp.py; rng(1) in f15_checks.py.

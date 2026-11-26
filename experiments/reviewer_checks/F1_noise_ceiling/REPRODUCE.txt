@@ -1,0 +1,23 @@
+F1_noise_ceiling -- Supplement S13 (noise ceiling of the direction-agreement rate).
+
+Purpose: simulates how high the split-half agreement between the ATE ranking and the bias-RMSE ranking could be if ATE carried
+the same ranking information as the bias but with the observed seed-to-seed noise (ceiling simulation, calibration and negative control).
+
+All commands are run from the repository root. PY is any Python 3.9+ environment with requirements.txt installed
+(scipy, pandas, numpy, pyyaml; matplotlib only for F3 05_extras.py). All scripts are CPU only; prefix with CUDA_VISIBLE_DEVICES="" if desired.
+  PY="python -I"
+Scripts resolve their paths from their own location, so the working directory does not matter.
+Raw inputs not in this repository: EuRoC raw data (see top-level README, "Getting EuRoC"; or set EUROC_DATA_DIR) and the per-run
+euroc_full/results*/runs/*/series.npz files (obtained by re-training, see top-level README).
+
+Inputs (all in this repository): euroc_full/results/metrics_wide.csv, euroc_full/results/runs_index.csv,
+  experiments/attitude_controls/ate_per_run_gated.csv.
+Commands:
+  $PY experiments/reviewer_checks/F1_noise_ceiling/reproduce.py       -> reproduce_observed.csv (reproduces 0.554 [0.444, 0.674] and the A/B values)
+  $PY experiments/reviewer_checks/F1_noise_ceiling/inspect_noise.py   (prints descriptive statistics of the ATE residuals; writes nothing)
+  $PY experiments/reviewer_checks/F1_noise_ceiling/inspect2.py        (same, writes nothing)
+  $PY experiments/reviewer_checks/F1_noise_ceiling/simulate.py 2000   -> results_ceiling_N2000.csv, results_calibration_N2000.csv,
+        sim_agree_{raw,oracle}_{C0,C1,V1,V2,V3}_N2000.npy (about 12 minutes, single thread; the .npy files are not stored in this repository,
+        they are read by ../decomposition/f15_checks.py)
+Random seeds: np.random.default_rng([20261126, source (0 raw / 1 oracle), variant index]); case bootstrap default_rng(777).
+common.py is adapted from verification/R-F_noncircular/rF_noncircular_stratified.py (that script is not executed or modified).

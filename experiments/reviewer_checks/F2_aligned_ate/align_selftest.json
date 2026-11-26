@@ -1,0 +1,7 @@
+{
+ "4dof_err_on_yaw+t_transform": 1.0658141036401503e-14,
+ "se3_err_on_general_rigid": 7.105427357601002e-14,
+ "4dof_err_on_general_rigid(should be >0)": 53.38522424978322,
+ "frac_4dof_le_none": 1.0,
+ "frac_se3_le_4dof": 1.0
+}

@@ -1,0 +1,27 @@
+F3_dose_response -- Supplement S15 (dose-response of the closed-loop position error to an injected bias error).
+
+Purpose: injects known accelerometer-bias offsets (constant, random and axis directions) and time-varying errors (alpha x the actual
+estimator error) into the closed-loop outage experiment over a grid of bias-RMSE-equivalent levels, and compares the resulting
+position-error curve, noise baselines, thresholds and pool position with the pool of 11 estimators x 10 seeds.
+
+All commands are run from the repository root. PY is any Python 3.9+ environment with requirements.txt installed
+(scipy, pandas, numpy, pyyaml; matplotlib only for F3 05_extras.py). All scripts are CPU only; prefix with CUDA_VISIBLE_DEVICES="" if desired.
+  PY="python -I"
+Scripts resolve their paths from their own location, so the working directory does not matter.
+Raw inputs not in this repository: EuRoC raw data (see top-level README, "Getting EuRoC"; or set EUROC_DATA_DIR) and the per-run
+euroc_full/results*/runs/*/series.npz files (obtained by re-training, see top-level README).
+
+Inputs: experiments/closed_loop/{run_closed_loop.py, eskf.py} (imported; their main programs are not executed),
+  experiments/closed_loop/{consequences_long.csv, predictors.csv, scenario_stats.csv}, euroc_full/results/metrics_wide.csv,
+  euroc_full/results/runs/*/series.npz (through run_closed_loop.load_seq), EuRoC raw data.
+Commands (about 1 minute each):
+  $PY experiments/reviewer_checks/F3_dose_response/01_repro.py      -> repro_check.csv (reproduces consequences_long.csv: base, O, L = 5 and 10 s, 231 sources incl. CTRL:bref)
+  $PY experiments/reviewer_checks/F3_dose_response/02_dose.py       -> dose_const_long.csv, dose_tv_long.csv, units.csv
+  $PY experiments/reviewer_checks/F3_dose_response/03_summarize.py  -> summary.txt, dose_table_by_level.csv, dose_table_by_seq.csv, dose_tv_table_by_level.csv,
+        thresholds.csv, thresholds_tv.csv, noise_baselines.csv, pool_runs_summary.csv, spearman_in_grid*.csv, observed_pool_spearman.csv
+        (reproduces scenario_stats.csv); it also appends to _tmp_tv.csv, a scratch file that can be deleted
+  $PY experiments/reviewer_checks/F3_dose_response/04_poolsim.py    -> poolsim_spearman.csv, poolsim_summary.txt, surrogate_by_run.csv, surrogate_check.csv
+  $PY experiments/reviewer_checks/F3_dose_response/05_extras.py     -> dose_at_pool_quantiles.csv, extras_summary.txt, fig_dose_response.png
+Only 01, 02 and the surrogate part of 04 need series.npz and EuRoC raw data; 03 and 05 run from the csv files stored here.
+Seeds: replicate noise as in run_closed_loop.rep_noise (1000 + rep); directions 20261126 + k; pool simulation 20261126.
+The long csv files (dose_const_long.csv, dose_tv_long.csv) are the raw outputs of 02_dose.py.

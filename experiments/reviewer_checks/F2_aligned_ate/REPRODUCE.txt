@@ -1,0 +1,23 @@
+F2_aligned_ate -- Supplement S14 (trajectory alignment before computing ATE).
+
+Purpose: rebuilds the open-loop trajectories of all runs for six attitude sources and computes ATE with no alignment, 4-DoF alignment
+(translation + yaw) and SE(3) alignment, then repeats the direction-agreement analysis (ATE ranking vs bias-RMSE ranking).
+
+All commands are run from the repository root. PY is any Python 3.9+ environment with requirements.txt installed
+(scipy, pandas, numpy, pyyaml; matplotlib only for F3 05_extras.py). All scripts are CPU only; prefix with CUDA_VISIBLE_DEVICES="" if desired.
+  PY="python -I"
+Scripts resolve their paths from their own location, so the working directory does not matter.
+Raw inputs not in this repository: EuRoC raw data (see top-level README, "Getting EuRoC"; or set EUROC_DATA_DIR) and the per-run
+euroc_full/results*/runs/*/series.npz files (obtained by re-training, see top-level README).
+
+Inputs: euroc_full/results/{metrics_wide.csv, runs_index.csv, runs/*/series.npz}, euroc_full/configs/full.yaml, EuRoC Machine Hall raw data,
+  experiments/attitude_controls/ate_per_run_gated.csv (reproduction check).
+Commands (about 1 minute in total):
+  $PY experiments/reviewer_checks/F2_aligned_ate/01_build_ate.py     -> ate_aligned_per_run.csv (1026 run x sequence rows, 6 sources, 3 alignments)
+                                                                       needs series.npz and EuRoC raw data; F2_LIMIT=<n> makes a smoke run
+  $PY experiments/reviewer_checks/F2_aligned_ate/02_repro.py         -> repro_check.json (unaligned ATE vs the stored csv; max relative difference)
+  $PY experiments/reviewer_checks/F2_aligned_ate/04_align_selftest.py -> align_selftest.json (self-test of the alignment code)
+  $PY experiments/reviewer_checks/F2_aligned_ate/03_agreement.py     -> agreement_aligned.csv, agreement_aligned_by_unit.csv, ate_magnitudes.csv
+Steps 02, 03 and 04 only need the csv files stored here and in the repository; only step 01 needs the raw inputs.
+Seeds: sampling 20260126; split-half default_rng(0) (same as the original script); bootstrap seeds fixed per group.
+The unaligned reference value 0.554 [0.444, 0.674] is reproduced by verification/R-F_noncircular/rF_noncircular_stratified.py.

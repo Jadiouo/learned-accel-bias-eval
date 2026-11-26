@@ -1,0 +1,21 @@
+F5_scaled_attitude -- Supplement S16.2 (rescaling the oracle attitude error).
+
+Purpose: scales the error rotation of the oracle attitude by a factor s (including s = 1 and s = 0, and rescaling to target RMS
+levels), rebuilds the open-loop ATE of every run, and measures how the agreement with the bias-RMSE ranking changes with the
+attitude-error size. Variants: W (world-frame error), B (body-frame error), T (tilt components only).
+
+All commands are run from the repository root. PY is any Python 3.9+ environment with requirements.txt installed
+(scipy, pandas, numpy, pyyaml; matplotlib only for F3 05_extras.py). All scripts are CPU only; prefix with CUDA_VISIBLE_DEVICES="" if desired.
+  PY="python -I"
+Scripts resolve their paths from their own location, so the working directory does not matter.
+Raw inputs not in this repository: EuRoC raw data (see top-level README, "Getting EuRoC"; or set EUROC_DATA_DIR) and the per-run
+euroc_full/results*/runs/*/series.npz files (obtained by re-training, see top-level README).
+
+Inputs: euroc_full/results/{metrics_wide.csv, runs_index.csv, runs/*/series.npz}, EuRoC Machine Hall raw data,
+  experiments/attitude_controls/ate_per_run_gated.csv; imports ../F2_aligned_ate/f2_lib.py and ../F1_noise_ceiling/common.py.
+Commands (about 20 s in total):
+  $PY experiments/reviewer_checks/F5_scaled_attitude/01_build.py     -> ate_scaled_per_run.csv, diag_by_case.csv, rm_scales.json
+                                                                       (needs series.npz and EuRoC raw data)
+  $PY experiments/reviewer_checks/F5_scaled_attitude/02_analyze.py   -> results_agreement.csv, results_reference.csv, repro_check.json
+                                                                       (runs from the csv files stored here)
+Seeds: bootstrap 20261126; split halves are enumerated (252).

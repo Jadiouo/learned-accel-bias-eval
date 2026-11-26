@@ -1,0 +1,20 @@
+{
+ "n_pairs_total": 6156,
+ "max_rel_all_sources_all_runs": 5.646002543186157e-13,
+ "sample24_runs": {
+  "n_rows": 72,
+  "max_rel": 5.646002543186157e-13,
+  "raw_max": 1.25621407088786e-15,
+  "oracle_max": 5.646002543186157e-13
+ },
+ "per_source_max_rel": {
+  "a2_raw_gyro_200Hz": 1.0222899453695375e-15,
+  "a_raw_gyro(paper)": 1.887299128737709e-15,
+  "b_gyro-GT-bias(oracle)": 5.646002543186157e-13,
+  "c_static-mean-bias": 2.5262718093526706e-14,
+  "d_mahony(kp=1,ki=0.05)": 3.4237466722914704e-15,
+  "e_mahony_gated(kp=1,ki=0.05)": 2.3079187892722175e-15
+ },
+ "raw_vs_metrics_wide_gyro_ate_max_rel_all_rows": 3.3483855715054306e-15,
+ "n_raw_run_seq_rows": 1026
+}

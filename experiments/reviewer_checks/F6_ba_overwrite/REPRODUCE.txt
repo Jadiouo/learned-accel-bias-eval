@@ -1,0 +1,23 @@
+F6_ba_overwrite -- Supplement S16.3 (bias-state overwrite in the closed-loop ESKF).
+
+Purpose: reruns the closed-loop outage experiment with the filter's accelerometer-bias state overwritten at the start of the outage
+(conditions a/b/c, three process-noise scales), with the Shapley decomposition and onset analysis, to test whether overwriting the
+bias state breaks the tilt-bias compensation that the filter had built up before the outage.
+
+All commands are run from the repository root. PY is any Python 3.9+ environment with requirements.txt installed
+(scipy, pandas, numpy, pyyaml; matplotlib only for F3 05_extras.py). All scripts are CPU only; prefix with CUDA_VISIBLE_DEVICES="" if desired.
+  PY="python -I"
+Scripts resolve their paths from their own location, so the working directory does not matter.
+Raw inputs not in this repository: EuRoC raw data (see top-level README, "Getting EuRoC"; or set EUROC_DATA_DIR) and the per-run
+euroc_full/results*/runs/*/series.npz files (obtained by re-training, see top-level README).
+
+Inputs: experiments/closed_loop/{run_closed_loop.py, eskf.py, run_pre_outage.py (only make_Q_ba), consequences_long.csv, decomp_units.csv,
+  decomp_summary.csv, variants_long.csv, variants_decomp_units.csv}, euroc_full/results/{metrics_wide.csv, runs/*/series.npz}, EuRoC raw data.
+Commands (CPU, 2 worker processes in 01_run.py):
+  $PY experiments/reviewer_checks/F6_ba_overwrite/01_run.py        -> cond_long.csv, src_long.csv, shapley_units.csv, onset_units.csv
+  $PY experiments/reviewer_checks/F6_ba_overwrite/02_repro.py      -> repro_check.txt (reproduction checks against the stored closed-loop csv files)
+  $PY experiments/reviewer_checks/F6_ba_overwrite/03_summarize.py  -> summary.txt, table_conditions.csv, table_shapley.csv, table_onset.csv,
+                                                                    table_onset_corr.csv, table_ratio.csv
+  $PY experiments/reviewer_checks/F6_ba_overwrite/04_checks.py     -> checks.txt (construction check, per-sequence ratios, exploratory correlation)
+Steps 01 and 04 need series.npz and EuRoC raw data; 02 and 03 run from the csv files stored here and in experiments/closed_loop.
+Seeds: replicate noise as in run_closed_loop.rep_noise (1000 + rep); bootstrap 20261126.

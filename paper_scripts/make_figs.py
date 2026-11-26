@@ -35,7 +35,7 @@ def save(fig, name):
 # ------------------------------------------------------------------ Fig. 1
 def fig1():
     fig, ax = plt.subplots(figsize=(W, 2.5))
-    ax.set_xlim(0, 10); ax.set_ylim(0, 8.4); ax.axis("off")
+    ax.set_xlim(-0.2, 10.2); ax.set_ylim(-0.2, 8.4); ax.axis("off")
 
     def box(x, y, w, h, text, fc="white", ec="black", ls="-", fs=8):
         ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.02,rounding_size=0.12",
@@ -53,7 +53,7 @@ def fig1():
     arr(6.0, 6.2, 7.3, 5.0); arr(6.0, 3.1, 7.3, 4.2)
     ax.text(4.75, 7.75, "shared attitude: IABE\n(shared terms cancel)", fontsize=8, ha="center", va="center", color="#007A5A")
     ax.add_patch(Rectangle((3.4, 5.3), 2.7, 1.8, fill=False, ec=OI["green"], lw=1.2))
-    box(0.0, 0.0, 10.0, 1.2, "ESKF onset states (IV-B): different quantity", ls="--", fs=8)
+    box(0.0, 0.0, 10.0, 1.2, "ESKF onset states (IV-C): different quantity", ls="--", fs=8)
     save(fig, "fig1_error_flow.pdf")
 
 
@@ -97,7 +97,7 @@ def fig_scatter():
 def fig_shapley():
     s = pd.read_csv(CL / "table3_shapley.csv")
     parts = [("tilt", "tilt"), ("vel", "velocity"), ("pos", "position"), ("yaw", "yaw"), ("bg", "gyro bias"), ("floor", "unattrib.")]
-    cfgs = [("base", "base", OI["blue"], None), ("q10", "$Q\\times10$", OI["orange"], "//"), ("q01", "$Q\\times0.1$", OI["green"], "xx")]
+    cfgs = [("base", "O_base", OI["blue"], None), ("q10", "O_q10", OI["orange"], None), ("q01", "O_q01", OI["green"], None)]  # colors only; the three differ in lightness, so they stay distinct in grayscale
     fig, axs = plt.subplots(1, 2, figsize=(W, 1.9), sharey=True)
     for ax, L in zip(axs, (5, 10)):
         for j, (cfg, lab, col, h) in enumerate(cfgs):
@@ -117,34 +117,97 @@ def fig_shapley():
     save(fig, "fig3_shapley.pdf")
 
 
-# ------------------------------------------------------------------ Fig. 4 (agreement)
+# ------------------------------------------------------------------ Fig. 4 (decomposition chain of the agreement)
+RC = R / "experiments/reviewer_checks"
+_CHAIN = {}
+
+
+def chain_data():
+    """Numbers behind Fig. 4 and the supplementary tables S13-S16, read from the stored result files (nothing typed in).
+    Agreement values use the 252-split enumeration of the F1 pipeline (all pairs selected on one seed half by bias RMSE, BH q=0.05);
+    95% CIs of the nine-case pool are leave-one-sequence-out jackknife intervals with t_4 quantiles (five sequence clusters)."""
+    if _CHAIN:
+        return _CHAIN
+    import sys
+    from scipy import stats
+    sys.dont_write_bytecode = True
+    sys.path.insert(0, str(RC / "F1_noise_ceiling"))
+    import common as cm
+    units, bias, ate = cm.load()
+    sel = cm.precompute_selection(units, bias)
+    runs = pd.read_csv(RC / "decomposition/f5_decomp_runs.csv")
+    seqs = sorted({u[1] for u in units})
+
+    def mat(src, col):
+        return {u: runs[(runs.src == src) & (runs.regime == u[0]) & (runs.seq == u[1])]
+                .pivot_table(index="seed", columns="method", values=col)[cm.DL].values for u in units}
+
+    def jk(m):
+        A, N = cm.agree_counts(m, units, sel)
+        a, n = A.sum(0), N.sum(0)
+        pt = a.sum() / n.sum()
+        th = np.array([a[[u[1] != s for u in units]].sum() / n[[u[1] != s for u in units]].sum() for s in seqs])
+        se = np.sqrt((len(seqs) - 1) / len(seqs) * ((th - th.mean()) ** 2).sum())
+        t = stats.t.ppf(0.975, len(seqs) - 1)
+        return dict(pt=pt, lo=max(pt - t * se, 0.0), hi=min(pt + t * se, 1.0))
+
+    d = {}
+    for src in ("raw", "oracle"):
+        d[src, "full"] = jk(ate[src])
+        for v in ("noL", "noQ", "I", "negL"):
+            d[src, v] = jk(mat(src, v))
+        rot = [cm_pt for cm_pt in (jk(mat(src, f"rot{i}"))["pt"] for i in range(30))]
+        d[src, "rot"] = dict(lo=min(rot), hi=max(rot), mean=float(np.mean(rot)), n=len(rot))
+    f4 = pd.read_csv(RC / "F4_seqcluster/f4_results.csv")
+    d["retest"] = float(f4[f4.source == "bias RMSE own retest / ALL"].point.iloc[0])
+    ce = pd.read_csv(RC / "F1_noise_ceiling/results_ceiling_N2000.csv")
+    ce = ce[(ce.version == "fixed_cases")]
+    d["ceil"] = ce
+    r = ce[(ce.source == "raw") & (ce.group == "ALL") & ce.variant.isin(["V1", "V2", "V3"])].ceil_median
+    d["ceil_band"] = (float(r.min()), float(r.max()))
+    al = pd.read_csv(RC / "F2_aligned_ate/agreement_aligned.csv")
+    d["align"] = al[al.group == "ALL"].set_index("measure")
+    d["align_mag"] = pd.read_csv(RC / "F2_aligned_ate/ate_magnitudes.csv")
+    _CHAIN.update(d)
+    return _CHAIN
+
+
 def fig_agree():
-    a = pd.read_csv(R / "verification/R-F_noncircular/part2_splithalf_agreement_stratified.csv")
-    items = [("IABE", "IABE", OI["grey"], "..."),
-             ("ATE:a_raw_gyro(paper)", "raw", OI["blue"], None),
-             ("ATE:b_gyro-GT-bias(oracle)", "oracle", OI["verm"], "//"),
-             ("ATE:c_static-mean-bias", "static", OI["green"], "xx"),
-             ("ATE:d_mahony(kp=1,ki=0.05)", "Mahony", OI["pink"], "\\\\"),
-             ("ATE:e_mahony_gated(kp=1,ki=0.05)", "gated M.", OI["orange"], "--")]
-    fig, axs = plt.subplots(1, 2, figsize=(W, 2.0), sharey=True)
-    for ax, g in zip(axs, ("A", "B")):
-        d = a[a.group == g].set_index("measure")
-        for i, (m, lab, col, h) in enumerate(items):
-            r = d.loc[m]
-            ax.bar(i, r.pooled_rate, color=col, hatch=h, ec="black", lw=0.4, width=0.75,
-                   yerr=[[r.pooled_rate - r.seqboot_lo], [r.seqboot_hi - r.pooled_rate]],
-                   error_kw=dict(lw=0.6, capsize=1.5))
-            if g == "B":
-                per = a[a.group.str.startswith("B/") & (a.measure == m)].pooled_rate
-                ax.scatter([i] * len(per), per, s=7, color="black", marker="_", lw=0.8, zorder=4)
-        ax.axhline(0.988, color="black", lw=0.7, ls="--")
-        ax.axhline(0.5, color=OI["grey"], lw=0.5, ls=":")
-        ax.set_xticks(range(len(items))); ax.set_xticklabels([l for _, l, _, _ in items], rotation=50, ha="right", fontsize=8)
-        ax.set_title(("Regime A (5 seq.)" if g == "A" else "Regime B (4 seq.)"), fontsize=8)
-        ax.set_ylim(0, 1.05)
-    axs[0].set_ylabel("direction agreement")
-    axs[0].text(5.4, 0.93, "0.99", fontsize=8, ha="right", va="top")
-    fig.subplots_adjust(wspace=0.06, bottom=0.28, top=0.9, left=0.13, right=0.99)
+    c = chain_data()
+    al = c["align"].loc["a_raw_gyro(paper)|se3"]
+    r2 = lambda v: round(float(v), 2)
+    rows = [  # (label, kind, point/low, high, CI, colour)
+        ("bias RMSE retest", "pt", c["retest"], None, None, OI["grey"]),
+        ("IABE", "pt", c["raw", "I"]["pt"], None, (c["raw", "I"]["lo"], c["raw", "I"]["hi"]), OI["green"]),
+        ("ATE, leakage removed", "pt", c["raw", "noL"]["pt"], None, (c["raw", "noL"]["lo"], c["raw", "noL"]["hi"]), OI["green"]),
+        ("ATE, raw attitude", "pt", c["raw", "full"]["pt"], None, (c["raw", "full"]["lo"], c["raw", "full"]["hi"]), OI["blue"]),
+        ("leakage, random dir.", "band", c["raw", "rot"]["lo"], c["raw", "rot"]["hi"], None, OI["orange"]),
+        ("ATE, SE(3)-aligned", "pt", al.pooled_rate, None, (al.seqboot_lo, al.seqboot_hi), OI["pink"]),
+        ("ATE noise ceiling", "band", c["ceil_band"][0], c["ceil_band"][1], None, OI["sky"]),
+    ]
+    fig, ax = plt.subplots(figsize=(W, 1.85))
+    for i, (lab, kind, v0, v1, ci, col) in enumerate(rows):
+        if kind == "pt":
+            if ci is not None:
+                ax.plot(ci, [i, i], color=col, lw=1.4, solid_capstyle="butt", zorder=2)
+            ax.scatter([v0], [i], s=26, color=col, ec="black", lw=0.5, zorder=3)
+        else:
+            ax.add_patch(Rectangle((v0, i - 0.28), v1 - v0, 0.56, fc=col, ec=col, alpha=0.55, lw=0.8, zorder=2))
+    ax.axvline(0.5, color=OI["grey"], lw=0.5, ls=":", zorder=1)
+    ax.set_yticks(range(len(rows))); ax.set_yticklabels([r[0] for r in rows])
+    ax.set_ylim(len(rows) - 0.4, -0.6)
+    ax.set_xlim(0.25, 1.02); ax.set_xticks([0.25, 0.5, 0.75, 1.0])
+    ax.set_xlabel("direction agreement (nine cases pooled)")
+    # step labels: the two drops of the chain, as differences of the rounded points
+    d1 = r2(c["retest"]) - r2(c["raw", "I"]["pt"]); d2 = r2(c["raw", "noL"]["pt"]) - r2(c["raw", "full"]["pt"])
+    ax.text(0.27, 0.5, f"double integration\n$-${d1:.2f}", fontsize=8, va="center", ha="left", color=OI["black"], linespacing=0.95,
+            bbox=dict(fc="white", ec="none", pad=0.6))
+    ax.text(0.635, 2.5, f"shared leakage term $-${d2:.2f}", fontsize=7.5, va="center", ha="left", color=OI["black"], linespacing=0.95,
+            bbox=dict(fc="white", ec="none", pad=0.6))
+    for sp in ("top", "right"):
+        ax.spines[sp].set_visible(False)
+    ax.tick_params(axis="y", length=0)
+    fig.subplots_adjust(left=0.37, right=0.985, bottom=0.2, top=0.98)
     save(fig, "fig4_agreement.pdf")
 
 
@@ -351,3 +414,127 @@ def supp_tables():
 
 if __name__ == "__main__":
     supp_tables()
+
+
+# ------------------------------------------------------------------ Supplement tables S13-S16 (generated TeX; every number is read from the stored result files)
+def supp_tables_g():
+    here = Path(__file__).resolve().parent
+    c = chain_data()
+    top = lambda cap, lab, cols, tc="3pt": ["\\begin{table}[!t]", f"\\caption{{{cap}}}", f"\\label{{{lab}}}", "\\centering", "\\scriptsize",
+                                            f"\\setlength{{\\tabcolsep}}{{{tc}}}", f"\\begin{{tabular}}{{@{{}}{cols}@{{}}}}", "\\toprule"]
+    end = ["\\bottomrule", "\\end{tabular}", "\\end{table}"]
+    ci = lambda d, nd=2: f"{d['pt']:.{nd}f} [{d['lo']:.{nd}f}, {d['hi']:.{nd}f}]"
+
+    # S13: seed-noise ceiling (F1)
+    ce = c["ceil"]
+    out = top("Seed-noise ceiling of the direction agreement. Cases: nine pooled, or the cases of regime A or B. Observed: all 252 splits. V1--V3: median [2.5th, 97.5th percentile] of 2000 simulations in which the trajectory-error ranking follows bias error exactly and carries the observed seed noise; the case set is fixed. V1 mixes the residuals of all methods before reshuffling, V2 keeps each method's residual scale, and V3 takes the signal from the bias means.",
+              "tab:ceiling", "llcccc", "1.8pt")
+    out += ["Attitude & Cases & Observed & V1 & V2 & V3 \\\\", "\\midrule"]
+    for src, sl in (("raw", "raw"), ("oracle", "oracle")):
+        for g, gl in (("ALL", "nine"), ("A", "A"), ("B", "B")):
+            sub = ce[(ce.source == src) & (ce.group == g)].set_index("variant")
+            cells = [f"{sub.loc[v].ceil_median:.2f} [{sub.loc[v].ceil_p2_5:.2f}, {sub.loc[v].ceil_p97_5:.2f}]" for v in ("V1", "V2", "V3")]
+            out.append(f"{sl} & {gl} & {sub.loc['V1'].observed:.3f} & " + " & ".join(cells) + " \\\\")
+    out += end
+    (here / "supp_table_ceiling.tex").write_text("\n".join(out) + "\n")
+
+    # S14: aligned ATE (F2)
+    al, mg = c["align"], c["align_mag"]
+    mg = mg[mg.regime == "ALL"].set_index("source")
+    out = top("Direction agreement and median ATE with and without alignment of the open-loop trajectory to the reference trajectory (nine cases pooled; 1000 random splits of the original pipeline, 95\\% sequence-cluster bootstrap CI). 4DoF: translation and yaw; SE(3): rigid transform.",
+              "tab:align", "llcc", "4pt")
+    out += ["Attitude & Alignment & Median ATE (m) & Agreement [95\\% CI] \\\\", "\\midrule"]
+    out.append(f"bias RMSE & retest & --- & {al.loc['bias_rmse'].pooled_rate:.3f} [{al.loc['bias_rmse'].seqboot_lo:.3f}, {al.loc['bias_rmse'].seqboot_hi:.3f}] \\\\")
+    out.append(f"IABE (reference attitude) & --- & {mg.loc['a_raw_gyro(paper)'].iabe_rot_median:.3f} & {al.loc['iabe_rot'].pooled_rate:.3f} [{al.loc['iabe_rot'].seqboot_lo:.3f}, {al.loc['iabe_rot'].seqboot_hi:.3f}] \\\\")
+    for key, sl in (("a_raw_gyro(paper)", "raw"), ("b_gyro-GT-bias(oracle)", "oracle")):
+        for tag, tl, col in (("none", "none", "ate_none_median"), ("4dof", "4DoF", "ate_4dof_median"), ("se3", "SE(3)", "ate_se3_median")):
+            r = al.loc[f"{key}|{tag}"]
+            m = mg.loc[key][col]
+            out.append(f"{sl} & {tl} & {m:.2f} & {r.pooled_rate:.3f} [{r.seqboot_lo:.3f}, {r.seqboot_hi:.3f}] \\\\")
+    out += end
+    (here / "supp_table_align.tex").write_text("\n".join(out) + "\n")
+
+    # S15: dose response (F3)
+    F3 = RC / "F3_dose_response"
+    th = pd.read_csv(F3 / "thresholds.csv"); th = th[th.group == "all_rand"].set_index("L")
+    nb = pd.read_csv(F3 / "noise_baselines.csv", index_col=0)
+    pr = pd.read_csv(F3 / "pool_runs_summary.csv")
+    q = pr[pr.L == 10].bias_rmse_avg
+    e = lambda v: f"{v:.1e}".replace("e-0", "\\times10^{-").replace("e-", "\\times10^{-") + "}"
+    out = top("Detection thresholds of the closed-loop dose response (original protocol, random-direction constant offsets injected into the outage, 25 units). Thresholds are bias RMSE in m/s$^2$ (per-axis rms; a constant offset has $\\lVert\\boldsymbol\\delta\\rVert=\\sqrt3$ times this). $N_{\\mathrm{rep}}$ and $N_{\\mathrm{seq}}$: spread of the shared endpoint error across repetitions and across sequences (m). $T_{\\mathrm{rep}}$, $T_{\\mathrm{seq}}$: smallest size at which the median change of $C_{\\mathrm{abs}}$ stays above $N_{\\mathrm{rep}}$ or $N_{\\mathrm{seq}}$; $T_{10\\%}$: above 10\\% of the shared endpoint error. Last two columns: share of the 1026 learned and baseline runs whose bias RMSE exceeds $T_{\\mathrm{rep}}$ or $T_{\\mathrm{seq}}$.",
+              "tab:dosethr", "cccccccc", "2pt")
+    out += ["$L$ (s) & $N_{\\mathrm{rep}}$ & $N_{\\mathrm{seq}}$ & $T_{\\mathrm{rep}}$ & $T_{\\mathrm{seq}}$ & $T_{10\\%}$ & $>T_{\\mathrm{rep}}$ & $>T_{\\mathrm{seq}}$ \\\\", "\\midrule"]
+    for L in (5, 10):
+        qq = pr[pr.L == L].bias_rmse_avg
+        out.append(f"{L} & {nb.loc[L].N_rep:.2f} & {nb.loc[L].N_seq:.2f} & ${e(th.loc[L].T_rep)}$ & ${e(th.loc[L].T_seq)}$ & ${e(th.loc[L].T_10pct)}$ & "
+                   f"{100 * (qq > th.loc[L].T_rep).mean():.1f}\\% & {100 * (qq > th.loc[L].T_seq).mean():.1f}\\% \\\\")
+    out += end
+    (here / "supp_table_dosethr.tex").write_text("\n".join(out) + "\n")
+    c["pool_q"] = dict(med=float(q.median()), p95=float(q.quantile(.95)), max=float(q.max()), n=int(len(q)))
+
+    ps = pd.read_csv(F3 / "poolsim_spearman.csv"); ps = ps[ps.cons == "abs"]
+    out = top("Expected rank correlation between bias RMSE and the shared endpoint error $C_{\\mathrm{abs}}$ under the pool-like simulation: each method receives a constant offset of its actual bias RMSE (times the scale) in a random direction; cell-median Spearman correlation over nine cases, median [2.5th, 97.5th percentile] of 2000 draws. Observed: values of the experiment.",
+              "tab:dosesim", "lccc", "3pt")
+    out += ["Scale & $L=5$~s & $L=10$~s & Pool max (m/s$^2$) \\\\", "\\midrule"]
+    obs = {L: float(ps[ps.L == L].observed.iloc[0]) for L in (5, 10)}
+    for sc in (1, 3, 10, 30, 100):
+        cells = []
+        for L in (5, 10):
+            r = ps[(ps.L == L) & (ps.scale == sc)].iloc[0]
+            cells.append(f"{r.rho_med:.2f} [{r.rho_lo:.2f}, {r.rho_hi:.2f}]".replace("-", "$-$"))
+        pm = ps[(ps.L == 5) & (ps.scale == sc)].iloc[0].pool_max_rmse_scaled
+        out.append(f"$\\times${sc} & {cells[0]} & {cells[1]} & {pm:.2f} \\\\")
+    out.append("\\midrule")
+    out.append(f"Observed & {obs[5]:.2f} & {obs[10]:.2f} & --- \\\\")
+    out += end
+    (here / "supp_table_dosesim.tex").write_text("\n".join(out) + "\n")
+
+    # S16.1: decomposition (decomposition, nine cases)
+    out = top("Direction agreement when one term of Proposition~1(i) is changed (nine cases pooled, 252 splits, 95\\% leave-one-sequence-out jackknife CI with $t_4$ quantiles). $\\mathcal P[\\mathbf l]$: shared leakage term; $\\mathcal P[(C^{\\mathrm g}-C)\\boldsymbol\\varepsilon]$: bias error rotated by the attitude error; $\\mathcal P[C\\boldsymbol\\varepsilon]$: IABE trajectory. Random: the shared term rotated by 30 random fixed rotations (range of the 30 agreements).",
+              "tab:decomp", ">{\\raggedright\\arraybackslash}p{0.40\\columnwidth}cc", "3pt")
+    out += ["Trajectory error built from & Raw attitude & Oracle attitude \\\\", "\\midrule"]
+    for lab, key in (("all three terms (observed ATE)", "full"), ("without $\\mathcal P[\\mathbf l]$", "noL"),
+                     ("without $\\mathcal P[(C^{\\mathrm g}-C)\\boldsymbol\\varepsilon]$", "noQ"),
+                     ("$\\mathcal P[C\\boldsymbol\\varepsilon]$ only (IABE)", "I"), ("sign of $\\mathcal P[\\mathbf l]$ reversed", "negL")):
+        out.append(f"{lab} & {ci(c['raw', key])} & {ci(c['oracle', key])} \\\\")
+    out.append(f"$\\mathcal P[\\mathbf l]$ in random directions & {c['raw', 'rot']['lo']:.2f}--{c['raw', 'rot']['hi']:.2f} & {c['oracle', 'rot']['lo']:.2f}--{c['oracle', 'rot']['hi']:.2f} \\\\")
+    out += end
+    (here / "supp_table_decomp.tex").write_text("\n".join(out) + "\n")
+
+    # S16.2: synthetic scaling (F5), leakage-ratio-matched version
+    F5 = RC / "F5_scaled_attitude"
+    ra = pd.read_csv(F5 / "results_agreement.csv"); rs = json.load(open(F5 / "rm_scales.json"))
+    out = top("Synthetic scaling of the oracle attitude error: direction agreement when the attitude error of each case is rescaled so that its leakage ratio $g\\bar\\theta/\\lVert\\boldsymbol\\varepsilon\\rVert$ equals the target (median over the nine cases). Extrapolated: cases (of nine) whose scale factor exceeds 1, so that the error was enlarged. Intervals are not shown because five sequence clusters understate their width; the point estimates are consistent across the five sequences (text).",
+              "tab:scale", "cccccc", "3pt")
+    out += ["Target ratio & $\\bar\\theta$ (\\textdegree) & Agreement & Regime A & Regime B & Extrap. \\\\", "\\midrule"]
+    for t in ("30", "10", "3", "1", "0.3", "0.1"):
+        g = ra[ra.config == f"RM|r={t}"].set_index("group")
+        ext = sum(1 for k, v in rs.items() if k.split("|")[0] == t and v > 1.0)
+        out.append(f"{t} & {g.loc['ALL'].theta_bar_med:.3f} & {g.loc['ALL'].agree:.2f} & {g.loc['A'].agree:.2f} & {g.loc['B'].agree:.2f} & {ext} \\\\")
+    s1 = ra[ra.config == "W|s=1"].set_index("group")
+    s0 = ra[ra.config == "W|s=0"].set_index("group")
+    out.append("\\midrule")
+    out.append(f"Unscaled (oracle) & {s1.loc['ALL'].theta_bar_med:.3f} & {s1.loc['ALL'].agree:.2f} & {s1.loc['A'].agree:.2f} & {s1.loc['B'].agree:.2f} & --- \\\\")
+    out.append(f"Attitude error 0 (IABE) & 0 & {s0.loc['ALL'].agree:.2f} & {s0.loc['A'].agree:.2f} & {s0.loc['B'].agree:.2f} & --- \\\\")
+    out += end
+    (here / "supp_table_scale.tex").write_text("\n".join(out) + "\n")
+    c["scale_ext"] = {t: sum(1 for k, v in rs.items() if k.split("|")[0] == t and v > 1.0) for t in ("30", "10", "3", "1", "0.3", "0.1")}
+
+    # S16.3: overwriting the bias state (F6)
+    tc = pd.read_csv(RC / "F6_ba_overwrite/table_conditions.csv")
+    desc = {"a": "(a) inject $\\mathbf b_{\\mathrm{ref}}$ (original)", "b": "(b) keep the filter's own $b_a$",
+            "c": "(c) $\\mathbf b_{\\mathrm{ref}}$, onset tilt made consistent with it", "d": "(d) $\\mathbf b_{\\mathrm{ref}}$, ground-truth tilt",
+            "e": "(e) filter's $b_a$, ground-truth tilt", "f": "(f) $\\mathbf b_{\\mathrm{ref}}$, all five states at truth"}
+    out = top("Shared endpoint error $C_{\\mathrm{abs}}$ (m) under conditions that keep or replace the filter's own accelerometer-bias state $b_a$ at outage onset (original protocol, five sequences $\\times$ five repetitions; unit median). Ratio: median over units of the ratio to condition (a). Last column: sequences (of five) with a ratio below 0.8 at $L=10$~s.",
+              "tab:overwrite", ">{\\raggedright\\arraybackslash}p{0.40\\columnwidth}ccccc", "2.5pt")
+    out += ["Condition & $C_{\\mathrm{abs}}$, $L{=}5$ & Ratio & $C_{\\mathrm{abs}}$, $L{=}10$ & Ratio & $<0.8$ \\\\", "\\midrule"]
+    b5 = tc[(tc.q == "base") & (tc.L == 5)].set_index("cond"); b10 = tc[(tc.q == "base") & (tc.L == 10)].set_index("cond")
+    for k in "abcdef":
+        out.append(f"{desc[k]} & {b5.loc[k].abs_unit_median:.2f} & {b5.loc[k].ratio_vs_a_median:.2f} & {b10.loc[k].abs_unit_median:.2f} & {b10.loc[k].ratio_vs_a_median:.2f} & {int(b10.loc[k].n_seq_below_0p8)} \\\\")
+    out += end
+    (here / "supp_table_overwrite.tex").write_text("\n".join(out) + "\n")
+    c["overwrite"] = tc
+
+
+if __name__ == "__main__":
+    supp_tables_g()

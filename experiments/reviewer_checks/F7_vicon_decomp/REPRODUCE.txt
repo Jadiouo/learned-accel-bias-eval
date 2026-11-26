@@ -1,0 +1,23 @@
+F7_vicon_decomp -- Supplement S10 and S16.1 (Vicon-room version of the error decomposition; Machine Hall with and without Mamba).
+
+Purpose: applies the decomposition of ../decomposition (ATE = ||L + Q + I||, with variants noL, noQ, I, negL and random rotations) to the
+Vicon rooms V1/V2, and checks the agreement with the bias-RMSE ranking with and without the Mamba estimator, on both the Vicon rooms and
+the nine Machine Hall cases.
+
+All commands are run from the repository root. PY is any Python 3.9+ environment with requirements.txt installed
+(scipy, pandas, numpy, pyyaml; matplotlib only for F3 05_extras.py). All scripts are CPU only; prefix with CUDA_VISIBLE_DEVICES="" if desired.
+  PY="python -I"
+Scripts resolve their paths from their own location, so the working directory does not matter.
+Raw inputs not in this repository: EuRoC raw data (see top-level README, "Getting EuRoC"; or set EUROC_DATA_DIR) and the per-run
+euroc_full/results*/runs/*/series.npz files (obtained by re-training, see top-level README).
+For the Vicon rooms the raw data go under euroc_full/kaggle_vicon/data_vicon (or EUROC_DATA_DIR) and the run outputs under euroc_full/results_vicon/runs/.
+
+Inputs: euroc_full/results_vicon/{runs_index.csv, runs/*/metrics.json, runs/*/series.npz}, euroc_full/kaggle_vicon/data_vicon (EuRoC V1/V2),
+  euroc_full/configs/vicon.yaml, euroc_full/results/metrics_wide.csv, ../F1_noise_ceiling/common.py, ../decomposition/f5_decomp_runs.csv, and
+  euroc_full/analysis_vicon/full_2026-10-23/t1_ate_per_run_gated.csv. That last file is written by euroc_full/analysis_vicon/t1_leakage.py
+  and is NOT stored in this repository; vicon_runs.py and vicon_agree.py need it for their reproduction checks.
+Commands:
+  $PY experiments/reviewer_checks/F7_vicon_decomp/vicon_runs.py     -> vicon_decomp_runs.csv (660 runs x raw/oracle) and a reproduction check against t1_ate_per_run_gated.csv
+  $PY experiments/reviewer_checks/F7_vicon_decomp/vicon_agree.py    -> vicon_agree.csv, vicon_agree_stdout.txt
+  $PY experiments/reviewer_checks/F7_vicon_decomp/mh_nomamba.py     -> mh_nomamba_agree.csv, mh_nomamba_stdout.txt (runs from the stored csv files)
+Seeds: scipy Rotation.random(random_state=11) for the 30 random rotations; default_rng(0) for the 1000-split replication; all 252 splits are also enumerated.

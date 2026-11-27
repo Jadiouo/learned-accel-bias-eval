@@ -3,7 +3,7 @@
 Code and summary results for the paper
 
 > **Evaluating Learned Accelerometer-Bias Estimators by Trajectory Error: Tilt Leakage and a Closed-Loop Error Budget**
-> Hao-Ting Ho. Manuscript in preparation (not yet submitted).
+> Hao-Ting Ho. Submitted to IEEE Transactions on Aerospace and Electronic Systems, November 2026.
 
 The paper asks whether open-loop trajectory error can tell which learned accelerometer-bias estimator is more
 accurate. On EuRoC, it compares the ranking by trajectory error with the ranking by bias error against the dataset's
